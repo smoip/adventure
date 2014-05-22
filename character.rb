@@ -123,12 +123,12 @@ class Fighter < Character
 	
 	def initialize inName, npcFlag
 		super
-		maxHP=(5)
-		hp=(maxHP)
-		maxMP += (-5)
-		mp=(maxMP)
-		attackPoints += 1
-		defensePoints += 1
+		@maxHP=(5)
+		hp=(@maxHP)
+		@maxMP += (-5)
+		mp=(@maxMP)
+		@attackPoints += 1
+		@defensePoints += 1
 	end
 
 	def statsUp
@@ -144,9 +144,9 @@ class Mage < Character
 	
 	def initialize inName, npcFlag
 		super
-		mxHP -= 2
-		hp=(maxHP)
-		maxMP += 8
+		@maxHP -= 2
+		hp=(@maxHP)
+		@maxMP += 8
 		mp=(maxMP)
 	end
 	
