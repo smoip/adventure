@@ -1,7 +1,7 @@
 $LOAD_PATH.insert(0, "/users/laevsky/documents/learning ruby/adventure")
 require "magic.rb"
 
-# ---------------------------------
+
 class Character
 
 include Magic
@@ -21,7 +21,7 @@ include Magic
 		@alive = true
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
@@ -54,7 +54,7 @@ include Magic
 		end
 	end
 
-	def statusCheck
+	def status_check
 		["Name: #{name}", "Level: #{level}", "Exp: #{charExp}", "Class: #{self.class}", "Hit Points: #{currentHP}/#{maxHP}", "Magic Points: #{currentMP}/#{maxMP}", "Attack: #{attackPoints}", "Defense: #{defensePoints}"]
 	end
 	
@@ -178,11 +178,13 @@ end
 
 class Minotaur < Character
 	
-	def initialize inName, npcFlag
-		super
+	def initialize
+		super('Minotaur', 1)
 		@maxHP += 5
+		@currentHP = @maxHP
 		@maxMP -= 10
 		@attackPoints += 1
+		@currentMP = @maxMP
 		@expValue += 1
 	end
 end
