@@ -11,7 +11,7 @@ class DungeonMaster
 
 
 	def initialize
-	@session_item_number = 0
+	@game_items = []
 	end
 
 	def move_character
@@ -20,18 +20,23 @@ class DungeonMaster
 	
 	def find_item(character)
 		# decides what type of item has been found
-		# random generation
-		# use an array or hash with potion, weapon, armor
-		item_type = [:Potion, :Weapon, :Armor]
+		item_type = [Potion, Weapon, Armor]
 		
-		# These are the problem lines.  I'm doing something wrong with symbols
-		"item_number_#{@session_item_number}".to_sym = (item_type[rand(3)]).new
-		@session_item_number += 1
+		item = item_type.shuffle.first.new
 		# call Item.new with the appropriate info
 		
+		@game_items << item
+		# store item
+		
+		if character.recieve_item(item) == true
+			@game_items.pop
+		end
+		# if character accepts, item is moved out of dm's inventory
+	 
 		# assign Item to Character
 		# report results to Adventure
-		puts "item_number_#{@session_item_number}".to_sym.type
+		puts character.inventory
+	
 	end
 	
 	def battle(character_one, character_two)

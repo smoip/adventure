@@ -19,9 +19,10 @@ include Magic
 		@charExp = 0
 		@expValue = 1
 		@alive = true
+		@inventory = {'potion' => 0, 'weapon' => 0, 'armor' => 0}
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
@@ -130,6 +131,13 @@ include Magic
 			puts "#{(spell_effect['target_hp']).abs} hit points!"
 		end
 	end	
+	
+	def recieve_item(item)
+		puts "#{@name} has found #{item.sub_type}."
+		@inventory[item.type] = item
+		# implement a false return if player does not accept item
+		return true
+	end
 	
 end
 

@@ -53,16 +53,16 @@ end
 
 new_game = Game.new
 
-new_game.manage_output('Choose yes or no')
-new_game.manage_output(new_game.manage_input(['yes', 'no']))
-new_game.manage_output('Thanks!')
+# new_game.manage_output('Choose yes or no')
+# new_game.manage_output(new_game.manage_input(['yes', 'no']))
+# new_game.manage_output('Thanks!')
 
 guide = DungeonMaster.new
 player = Mage.new('Thaddeus', 0)
 monster = Minotaur.new
 
-guide.battle(player, monster)
+# guide.battle(player, monster)
 
 
-# guide.find_item(player)
+guide.find_item(player)
 # come back to this later

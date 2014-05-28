@@ -10,8 +10,11 @@ class Item
 	# sends effects to Character
 	
 	def initialize
+	@type = item
+	@sub_type = 'item'
 	end
 
+	attr_accessor :type, :sub_type
 	
 end
 
@@ -20,10 +23,10 @@ class Potion < Item
 	# potions, like spells, need a target
 	
 	def initialize
-		@type = 'Potion'
+		@type = 'potion'
+		@sub_type = ['healing potion', 'magic potion'].shuffle.first
 	end
-	
-	potion_type = [:heal_potion, :magic_potion]
+
 end
 
 class Weapon < Item
@@ -31,10 +34,10 @@ class Weapon < Item
 	# persistent items need an owner
 	
 	def initialize
-		@type = 'Weapon'
+		@type = 'weapon'
+		@sub_type = ['sword', 'axe', 'bow'].shuffle.first
 	end
-	
-	weapon_type = [:sword, :axe, :bow]
+
 end
 
 class Armor < Item
@@ -42,8 +45,8 @@ class Armor < Item
 	# persistent items need an owner
 	
 	def initialize
-	@type = 'Armor'
+		@type = 'armor'
+		@sub_type = ['plate', 'armor', 'leather'].shuffle.first
 	end
-	
-	armor_type = [:plate, :chain, :leather]
+
 end
