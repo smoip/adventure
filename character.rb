@@ -1,10 +1,12 @@
-$LOAD_PATH.insert(0, "/users/laevsky/documents/learning ruby/adventure")
-require "magic.rb"
+$LOAD_PATH.insert(0, "/users/roberts/documents/learning ruby/adventure")
+require "magic"
+require "qwertyio"
 
 
 class Character
 
 include Magic
+include QwertyIO
 
 	def initialize (inName, npcFlag)
 		@name = inName
@@ -19,7 +21,7 @@ include Magic
 		@charExp = 0
 		@expValue = 1
 		@alive = true
-		@inventory = {'potion' => 0, 'weapon' => 0, 'armor' => 0}
+		@inventory = {'potion' => Item.new(0), 'weapon' => Item.new(0), 'armor' => Item.new(0)}
 	end
 	
 	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory
@@ -42,7 +44,7 @@ include Magic
 			@currentHP = 0
 		end
 		unless alive?
-			puts "#{name} has perished."
+			manage_output("#{name} has perished.")
 		end
 	end
 	
@@ -61,18 +63,18 @@ include Magic
 	
 	def attack(target)
 		if target.alive
-			puts self.name + ' attacks ' + target.name + '.'
+			manage_output(self.name + ' attacks ' + target.name + '.')
 			if rand(target.defensePoints) == 0		
-				puts target.name + " takes #{self.attackPoints} damage!"
+				manage_output(target.name + " takes #{self.attackPoints} damage!")
 				target.hp=(-(self.attackPoints))
 					unless target.alive
 						gainExp(target.expValue)
 					end
 			else
-				puts self.name + ' misses!'
+				manage_output(self.name + ' misses!')
 			end
 		else
-			puts target.name + ' is already dead.'
+			manage_output(target.name + ' is already dead.')
 		end
 	end
 	
@@ -80,7 +82,7 @@ include Magic
 		# adds exp to total
 		# only prints for player character
 		unless @npc == true
-			puts "#{name} gains #{amount} experience."
+			manage_output("#{name} gains #{amount} experience.")
 		end
 		@charExp += amount
 		levelCheck
@@ -98,7 +100,7 @@ include Magic
 		while level < (@charExp/10)
 			unless @npc == true
 			# don't print npc level up info
-				puts self.name + ' gains a level!'
+				manage_output(self.name + ' gains a level!')
 			end
 			@level += 1
 			@charExp -= (@level * 10)
@@ -110,15 +112,15 @@ include Magic
 		@maxHP += 2
 		@maxMP += 2
 		@attackPoints += 1
-		@defensedefensePoints += 1
+		@defensePoints += 1
 		@expValue += 1
 	end
 	
 	def castSpell(spell_name, target)
-		puts "#{name} casts #{spell_name}."
+		manage_output("#{name} casts #{spell_name}.")
 		spell_effect = spells[spell_name]
 		if self.currentMP < spell_effect['mp']
-			puts 'Not enough MP.'
+			manage_output('Not enough MP.')
 		else
 			self.mp=(spell_effect['mp'])
 			target.hp=(spell_effect['target_hp'])
@@ -128,15 +130,54 @@ include Magic
 			elsif (spell_effect['target_hp']) < 0
 				print 'loses '
 			end
-			puts "#{(spell_effect['target_hp']).abs} hit points!"
+			manage_output("#{(spell_effect['target_hp']).abs} hit points!")
 		end
-	end	
+	end
+	
+	
+	def use_potion(potion_name)
+		if (@inventory['potion']).sub_type.to_s == potion_name
+			manage_output("#{name} uses #{potion_name}.")
+			potion_effect = potions[potion_name]
+			self.hp=(potion_effect['hp'])
+			self.mp=(potion_effect['mp'])
+			manage_output("#{name} recovers #{potion_effect['hp']} hit points and #{potion_effect['mp']} magic points.")
+			@inventory['potion'] = Item.new(0)
+		else
+			manage_output("#{name} does not have that potion.")
+		end
+	end
+	
 	
 	def recieve_item(item)
-		puts "#{@name} has found #{item.sub_type}."
-		@inventory[item.type] = item
-		# implement a false return if player does not accept item
-		return true
+		manage_output("#{@name} has found #{item.name}.")
+		manage_output("Keep #{item.name} and replace #{(@inventory[item.type]).name}?")
+		response = manage_input(['yes', 'no'])
+		if response == 'yes'
+			
+			old_item = @inventory[item.type]
+			apply_stats = old_item.report_item_stats
+			@attackPoints -= apply_stats[0]
+			@defensePoints -= apply_stats[1]
+			
+			@inventory[item.type] = item
+			apply_stats = item.report_item_stats
+			@attackPoints += apply_stats[0]
+			@defensePoints += apply_stats[1]
+			
+			return [true, old_item]
+		end
+		if response == 'no'
+			manage_output("#{@name} leaves the #{item.name}.")
+			return [false, nil]
+		end
+	end
+	
+	def inventory_check
+		manage_output("#{@name}'s Inventory: ")
+		manage_output("Potion: #{@inventory['potion'].name}")
+		manage_output("Weapon: #{@inventory['weapon'].name}")
+		manage_output("Armor: #{@inventory['armor'].name}")
 	end
 	
 end

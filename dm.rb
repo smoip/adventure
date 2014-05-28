@@ -14,30 +14,48 @@ class DungeonMaster
 	@game_items = []
 	end
 
+	attr_accessor :game_items
+
 	def move_character
 		# coordinates Character and Game_Map
 	end
 	
-	def find_item(character)
+	def find_item(character, item_level)
 		# decides what type of item has been found
 		item_type = [Potion, Weapon, Armor]
 		
-		item = item_type.shuffle.first.new
+		item = item_type.shuffle.first.new(item_level)
 		# call Item.new with the appropriate info
 		
 		@game_items << item
 		# store item
 		
-		if character.recieve_item(item) == true
+		
+		character_decision = character.recieve_item(item)
+		
+		if (character_decision[0]) == true
 			@game_items.pop
+			if character_decision[1].type != 'nothing'
+				@game_items << (character_decision[1])
+			end		
 		end
 		# if character accepts, item is moved out of dm's inventory
-	 
+		
+		 
 		# assign Item to Character
 		# report results to Adventure
-		puts character.inventory
+
 	
 	end
+	
+	def drop_item(item)
+	end
+	
+	def check_game_items
+		manage_output("Game Items: ")
+		@game_items.each { |x| manage_output(x.name) }
+	end
+		
 	
 	def battle(character_one, character_two)
 		# parameters for handling encounters between Characters
@@ -50,19 +68,17 @@ class DungeonMaster
 		if (battle_order[0]).npc == 0
 			# first is not npc
 			while true
-				puts "What does #{(battle_order[0]).name} do?"
+				manage_output("What does #{(battle_order[0]).name} do?")
 				# call player attack automated for now
 				# player  attacks  monster
 				(battle_order[0]).attack(battle_order[1])
 				if (battle_order[1]).alive? == false
-					# puts 'test 1'
 					(battle_order[0]).gainExp((battle_order[1]).expValue)
 					break
 				end
 				# monster  attacks  player
 				(battle_order[1]).attack(battle_order[0])
 				if (battle_order[0]).alive? == false
-					# puts 'test 2'
 					(battle_order[1]).gainExp((battle_order[0]).expValue)
 					break
 				end
@@ -73,16 +89,14 @@ class DungeonMaster
 				# monster  attacks  player
 				(battle_order[0]).attack(battle_order[1])
 				if (battle_order[1]).alive? == false
-					# puts 'test 3'
 					(battle_order[0]).gainExp((battle_order[1]).expValue)
 					break
 				end
-				puts "What does #{(battle_order[1]).name} do?"
+				manage_output("What does #{(battle_order[1]).name} do?")
 				# call player attack - automated for now
 				# player  attacks  monster
 				(battle_order[1]).attack(battle_order[0])
 				if (battle_order[0]).alive? == false
-					# puts 'test 4'
 					(battle_order[1]).gainExp((battle_order[0]).expValue)
 					break
 				end				
@@ -103,7 +117,7 @@ class DungeonMaster
 			battle_order[0] = character_two
 			battle_order[1] = character_one
 		end
-		puts "#{(battle_order[0]).name} moves first!"
+		manage_output("#{(battle_order[0]).name} moves first!")
 		return battle_order
 	end
 	

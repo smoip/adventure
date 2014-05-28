@@ -5,12 +5,19 @@
 # handles user-end display 
 # In a future version, handles all IO issues (remove puts, print from internal objects)
 
-$LOAD_PATH.insert(0, "/users/laevsky/documents/learning ruby/adventure")
+
+# need to implement a 'turn' system
+# what constitutes a turn?
+# move, attack, item, spell
+
+$LOAD_PATH.insert(0, "/users/roberts/documents/learning ruby/adventure")
 require "character"
 require "dm"
 require "map"
 require "magic"
 require "items"
+require "qwertyio"
+include QwertyIO
 
 
 class Game
@@ -18,44 +25,10 @@ class Game
 	def initialize
 	end
 	
-	def manage_input(good_answers)
-		# remove input decisions from internal modules
-		# good answers are arrays of strings supplied by caller
-		# - this might not be a good way to do it
-		# manage_input probably shouldn't be associated with an object
-		good_answer = false
-		while good_answer != true
-			# this is super sloppy and could probably be replaced with .find
-			input = gets.chomp.downcase.strip
-			indexer = (good_answers.length)
-			indexer.times do
-				indexer -= 1
-				if good_answers[indexer] == input
-					good_answer = true
-				end
-				if good_answer == true
-					return input
-				end
-			end	
-			manage_output('Please make a valid choice')
-			manage_output(good_answers.each { |x| x })
-		end
-		
-	end
-	
-	def manage_output(things_to_print)
-		# remove output decisions from internal modules
-		# may eventually be real display handling
-		puts things_to_print.to_s
-	end
 	
 end
 
 new_game = Game.new
-
-# new_game.manage_output('Choose yes or no')
-# new_game.manage_output(new_game.manage_input(['yes', 'no']))
-# new_game.manage_output('Thanks!')
 
 guide = DungeonMaster.new
 player = Mage.new('Thaddeus', 0)
@@ -63,6 +36,22 @@ monster = Minotaur.new
 
 # guide.battle(player, monster)
 
-
-guide.find_item(player)
+manage_output(player.status_check)
+guide.find_item(player, (rand(5)))
+manage_output(player.status_check)
+guide.find_item(player, 2)
+manage_output(player.status_check)
+guide.find_item(player, 3)
+manage_output(player.status_check)
+guide.find_item(player, (rand(2)))
+manage_output(player.status_check)
+guide.find_item(player, (rand(4)))
+manage_output(player.status_check)
 # come back to this later
+
+manage_output("use potion?")
+manage_input(['yes'])
+player.use_potion('healing potion')
+manage_output(player.status_check)
+player.inventory_check
+guide.check_game_items

@@ -1,12 +1,13 @@
 # an arena for testing character interactions directly
 # doesn't need to go through 'adventure'
 
-$LOAD_PATH.insert(0, "/users/laevsky/documents/learning ruby/adventure")
+$LOAD_PATH.insert(0, "/users/roberts/documents/learning ruby/adventure")
 require "character"
 require "dm"
 require "map"
 require "magic"
 require "items"
+require "qwertyio"
 
 # basic character interactions
 
