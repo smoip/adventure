@@ -24,7 +24,7 @@ include QwertyIO
 		@inventory = {'potion' => Item.new(0), 'weapon' => Item.new(0), 'armor' => Item.new(0)}
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory, :npc
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
