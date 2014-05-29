@@ -11,6 +11,7 @@
 # move, attack, item, spell
 
 $: << File.expand_path(File.dirname("adventure"))
+
 require "character"
 require "dm"
 require "map"
