@@ -3,8 +3,8 @@ require "qwertyio"
 
 class Character
 
-include Magic
-include QwertyIO
+	include Magic
+	include QwertyIO
 
 	def initialize (inName, npcFlag)
 		@name = inName

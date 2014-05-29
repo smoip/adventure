@@ -9,6 +9,7 @@
 
 class DungeonMaster
 
+	include QwertyIO
 
 	def initialize
 	@game_items = []
@@ -20,11 +21,19 @@ class DungeonMaster
 		# coordinates Character and Game_Map
 	end
 	
+	def item_type
+		[Potion, Weapon, Armor]
+	end
+	
+	# Num => Item.new
+	def random_item
+		item_type.shuffle.first
+	end
+	
 	def find_item(character, item_level)
 		# decides what type of item has been found
-		item_type = [Potion, Weapon, Armor]
 		
-		item = item_type.shuffle.first.new(item_level)
+		item = random_item.new(item_level)
 		# call Item.new with the appropriate info
 		
 		@game_items << item

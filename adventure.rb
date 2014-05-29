@@ -18,10 +18,12 @@ require "map"
 require "magic"
 require "items"
 require "qwertyio"
-include QwertyIO
 
 
 class Game
+
+	include QwertyIO
+
 
 	def initialize
 		@turn_counter = 0
@@ -94,23 +96,23 @@ class Game
 	
 end
 
-new_game = Game.new
-
-new_game.new_player(Fighter, 'George', 0)
-player = new_game.character_list['George']
-
-new_game.new_monster(Minotaur)
-monster = new_game.character_list['Minotaur']
-
-guide = DungeonMaster.new
-
-#player = Mage.new('Thaddeus', 0)
-
-puts "npc Flag: #{player.npc}"
-puts "counter: #{new_game.turn_counter}"
-
+# new_game = Game.new
+# 
+# new_game.new_player(Fighter, 'George', 0)
+# player = new_game.character_list['George']
+# 
+# new_game.new_monster(Minotaur)
+# monster = new_game.character_list['Minotaur']
+# 
+# guide = DungeonMaster.new
+# 
+# player = Mage.new('Thaddeus', 0)
+# 
+# puts "npc Flag: #{player.npc}"
+# puts "counter: #{new_game.turn_counter}"
+# 
 # guide.battle(player, monster)
-
-guide.find_item(player, (rand(5)))
-
-new_game.player_action(player)
+# 
+# guide.find_item(player, (rand(5)))
+# 
+# new_game.player_action(player)

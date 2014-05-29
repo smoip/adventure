@@ -9,6 +9,8 @@
 
 class Game_Map
 
+	include QwertyIO
+
 	def initialize
 	end
 	
