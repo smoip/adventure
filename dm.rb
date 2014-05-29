@@ -13,12 +13,68 @@ class DungeonMaster
 
 	def initialize
 	@game_items = []
+	@character_list = {}
 	end
 
-	attr_accessor :game_items
+	attr_accessor :game_items, :character_list
 
-	def move_character
-		# coordinates Character and Game_Map
+	def ask_player(player)
+		manage_output("What does #{player.name} do?")
+	end
+
+	def player_moves(player)
+		manage_output("#{player.name} moves.")
+		true
+	end
+	
+	def target_options(player, target_self)
+		target_options = @character_list.each_key.collect {|x| x.to_s.downcase }
+		# turn creature list into array
+		
+		if target_self == false
+			target_options.delete_at(target_options.index(player.name.downcase))
+			# remove player from targetable options
+		end
+		
+		target_options << 'cancel'
+		target = manage_input(target_options)
+		return target
+	end
+	
+	def player_attacks(player)
+		manage_output('Attack what?')
+		
+		target = target_options(player, false)
+		target.capitalize
+		# creature names are capitalized
+		if target = 'cancel'
+			return false
+		end
+		player.attack(@character_list[target])
+		true
+	end
+	
+	def player_uses_item(player)
+		puts player.inventory[potion]
+		manage_output('Use what item?')
+		manage_output("#{player.name} uses an item.")
+	end
+	
+	def player_casts_spell(player)
+		spell_options = player.spell_list
+		spell_options << 'cancel'
+		manage_output('Cast which spell?')
+		spell = manage_input(spell_options)
+		if spell == 'cancel'
+			return false
+		end
+		manage_output("Cast #{spell} at what target?")
+		target = target_options(player, true)
+		if target = 'cancel'
+			return false
+		end
+			player.cast_spell(spell, target)
+			true
 	end
 	
 	def item_type

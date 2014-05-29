@@ -20,9 +20,10 @@ class Character
 		@expValue = 1
 		@alive = true
 		@inventory = {'potion' => Item.new(0), 'weapon' => Item.new(0), 'armor' => Item.new(0)}
+		@spell_list = []
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory, :npc
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory, :npc, :spell_list
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
@@ -114,7 +115,7 @@ class Character
 		@expValue += 1
 	end
 	
-	def castSpell(spell_name, target)
+	def cast_spell(spell_name, target)
 		manage_output("#{name} casts #{spell_name}.")
 		spell_effect = spells[spell_name]
 		if self.currentMP < spell_effect['mp']
@@ -122,11 +123,11 @@ class Character
 		else
 			self.mp=(spell_effect['mp'])
 			target.hp=(spell_effect['target_hp'])
-			print "#{target.name} "
+			manage_output("#{target.name} ")
 			if (spell_effect['target_hp']) > 0
-				print 'gains '
+				manage_output('gains ')
 			elsif (spell_effect['target_hp']) < 0
-				print 'loses '
+				manage_output('loses ')
 			end
 			manage_output("#{(spell_effect['target_hp']).abs} hit points!")
 		end
@@ -212,6 +213,7 @@ class Mage < Character
 		@currentHP = @maxHP
 		@maxMP += 8
 		@currentMP = @maxMP
+		@spell_list << 'fireball' << 'heal'
 	end
 	
 	def statsUp

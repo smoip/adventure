@@ -27,45 +27,41 @@ class Game
 
 	def initialize
 		@turn_counter = 0
-		@character_list = {}
 	end
 	
-	attr_accessor :turn_counter, :character_list
+	attr_accessor :turn_counter
 	
 	def count_turn
 		@turn_counter += 1
 	end
 	
-	def player_action(player)
+	def player_action(dungeon_master, player)
 		if player.npc == 0
-			until @turn_counter ==1
-				manage_output("What does #{player.name} do?")
+			until @turn_counter != 0
+				dungeon_master.ask_player(player)
 			
 				player_move = Proc.new do
-					manage_output("#{player.name} moves.")
-					count_turn
+					if dungeon_master.player_moves(player) == true
+						count_turn
+					end
 				end
 			
 				player_attack = Proc.new do
-					manage_output('Attack what?')
-					target_options = @character_list.each_key.collect {|x| x.to_s }
-					target_options.shift
-					target_options
-					
-					# problem line
-					target = manage_input((target_options).capitalize)
-					puts "#{player.name} attacks #{target}"
-					count_turn
+					# call a method from DM for this handling
+					if dungeon_master.player_attacks(player) == true
+						count_turn
+					end
 				end
 	
 				player_item = Proc.new do
-					puts 'you use something'
+					dungeon_master.player_uses_item(player)
 					count_turn
 				end
 	
 				player_spell = Proc.new do
-					puts 'you cast something'
-					count_turn
+					if dungeon_master.player_casts_spell(player) == true
+						count_turn
+					end
 				end
 			
 				player_status = Proc.new do
@@ -76,25 +72,25 @@ class Game
 					manage_output(player.inventory_check)
 				end
 			
-				# this line is trouble - could be done with 'if's but I can't figure out how to call methods from the hash
-				# maybe they should be done with procs
 				action_choice = {'move' => player_move, 'attack' => player_attack, 'item' => player_item, 'spell' => player_spell, 'status' => player_status, 'inventory' => player_inventory}
 				action_choice[manage_input(['move', 'attack', 'item', 'spell', 'status', 'inventory'])].call
 			end
 		end
 	end
 	
-	def new_player(type, name, npc)
+	def new_player(dungeon_master, type, name, npc)
 		player = type.new(name, npc)
-		@character_list["#{player.name}"] = player
+		dungeon_master.character_list["#{player.name}"] = player
 	end
 	
-	def new_monster(type)
+	def new_monster(dungeon_master, type)
 		monster = type.new
-		@character_list["#{monster.name}"] = monster
+		dungeon_master.character_list["#{monster.name}"] = monster
 	end
 	
 end
+
+
 
 # new_game = Game.new
 # 
