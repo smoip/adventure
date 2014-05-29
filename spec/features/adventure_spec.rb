@@ -51,6 +51,20 @@ describe Game do
 			end
 		
 		end
+		
+		player_two.stub :manage_input, 'yes' do
+		# find potion
+			guide.stub :random_item, Potion do
+				guide.find_item(player_two, (rand(5)))
+			end
+		
+		end
+		
+		guide.new_room(true, guide)
+		guide.new_room(false, guide)
+		(guide.map_list[0]).type.must_equal 'entrance'
+		puts guide.map_list[1].description
+		
 	
 # 		new_game.stub :manage_input, 'move' do
 # 			new_game.player_action(guide, player)
@@ -64,17 +78,16 @@ describe Game do
 # 			new_game.player_action(guide, player)
 # 		end
 		
-# 		new_game.stub :manage_input, ('attack') do
-# 			guide.stub :manage_input, ('minotaur') do
-# 				new_game.player_action(guide, player)
-# 			end
-# 		end
+		new_game.stub :manage_input, ('attack') do
+			guide.stub :manage_input, ('minotaur') do
+				new_game.player_action(guide, player)
+			end
+		end
 
 # 		new_game.stub :manage_input, 'spell' do
 # 			new_game.player_action(guide, player_two)
 # 		end
 		
-		new_game.player_action(guide, player_two)
 		new_game.turn_counter.must_equal 1
 		
 	end

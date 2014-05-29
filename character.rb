@@ -123,13 +123,14 @@ class Character
 		else
 			self.mp=(spell_effect['mp'])
 			target.hp=(spell_effect['target_hp'])
-			manage_output("#{target.name} ")
+			effect_string = "#{target.name} "
 			if (spell_effect['target_hp']) > 0
-				manage_output('gains ')
+				effect_string += 'gains '
 			elsif (spell_effect['target_hp']) < 0
-				manage_output('loses ')
+				effect_string += 'loses '
 			end
-			manage_output("#{(spell_effect['target_hp']).abs} hit points!")
+			effect_string += "#{(spell_effect['target_hp']).abs} hit points!"
+			manage_output(effect_string)
 		end
 	end
 	
@@ -213,7 +214,8 @@ class Mage < Character
 		@currentHP = @maxHP
 		@maxMP += 8
 		@currentMP = @maxMP
-		@spell_list << 'fireball' << 'heal'
+		@spell_list << 'fireball'
+		@spell_list << 'heal'
 	end
 	
 	def statsUp

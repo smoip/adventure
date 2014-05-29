@@ -7,17 +7,64 @@
 
 # map decides what objects are present in a new square and reports back to dm
 
-class Game_Map
+
+# map knows when a monster is in a square
+# sends back info to dm on query
+# dm decides what monster, instantiates new monster
+# dm figures out 'initiative'
+# adventure keeps track of turn order
+
+class Room
 
 	include QwertyIO
 
-	def initialize
+	def initialize(dungeon_master)
+		@type = 'nothing'
+		@occupants = []
+		@description = 'a room'
 	end
 	
-	def new_space
-	# defines a new space, its description, what kind of spaces it can lead
-	# defines contents of new space
-	# possible that what is in a space belongs to DM rather than map
+		attr_accessor :type, :description
+	
+	def whats_inside
+		#decide what's in each space
+	end
+	
+end
+
+class Hallway < Room
+
+	def initialize(dungeon_master)
+		super
+		@type = 'hallway'
+		@sub_type_one_list = ['narrow,', 'broad,', 'steep,']
+		@sub_type_one = @sub_type_one_list.shuffle.first
+		@sub_type_two_list = ['twisting', 'straight', 'gently curving']
+		@sub_type_two = @sub_type_two_list.shuffle.first
+		@description = "a #{@sub_type_one} #{@sub_type_two} hallway"
+	end
+	
+end
+
+class Chamber < Room
+	
+	def initialize(dungeon_master)
+		super
+		@sub_type_one_list = ['long,', 'compact,', 'cavernous,']
+		@sub_type_one = @sub_type_one_list.shuffle.first
+		@sub_type_two_list = ['vaulted', 'high-ceilinged', 'dusty']
+		@sub_type_two = @sub_type_two_list.shuffle.first
+		@description = "a #{@sub_type_one} #{@sub_type_two} chamber"	
+	end
+
+end
+
+class Entrance < Room
+	
+	def initialize(dungeon_master)
+		super
+		@type = 'entrance'
+		@description = 'the entrance to the dungeon'
 	end
 	
 end
