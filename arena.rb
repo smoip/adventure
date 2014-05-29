@@ -1,7 +1,7 @@
 # an arena for testing character interactions directly
 # doesn't need to go through 'adventure'
 
-$LOAD_PATH.insert(0, "/users/roberts/documents/learning ruby/adventure")
+$: << File.expand_path(File.dirname("adventure"))
 require "character"
 require "dm"
 require "map"

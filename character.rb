@@ -1,7 +1,5 @@
-$LOAD_PATH.insert(0, "/users/roberts/documents/learning ruby/adventure")
 require "magic"
 require "qwertyio"
-
 
 class Character
 

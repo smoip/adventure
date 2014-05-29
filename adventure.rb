@@ -10,7 +10,7 @@
 # what constitutes a turn?
 # move, attack, item, spell
 
-$LOAD_PATH.insert(0, "/users/roberts/documents/learning ruby/adventure")
+$: << File.expand_path(File.dirname("adventure"))
 require "character"
 require "dm"
 require "map"
@@ -24,7 +24,7 @@ class Game
 
 	def initialize
 		@turn_counter = 0
-		@character_list = []
+		@character_list = {}
 	end
 	
 	attr_accessor :turn_counter, :character_list
@@ -45,6 +45,13 @@ class Game
 			
 				player_attack = Proc.new do
 					manage_output('Attack what?')
+					target_options = @character_list.each_key.collect {|x| x.to_s }
+					target_options.shift
+					target_options
+					
+					# problem line
+					target = manage_input((target_options).capitalize)
+					puts "#{player.name} attacks #{target}"
 					count_turn
 				end
 	
@@ -72,18 +79,31 @@ class Game
 				action_choice[manage_input(['move', 'attack', 'item', 'spell', 'status', 'inventory'])].call
 			end
 		end
-		
-		
 	end
 	
+	def new_player(type, name, npc)
+		player = type.new(name, npc)
+		@character_list["#{player.name}"] = player
+	end
+	
+	def new_monster(type)
+		monster = type.new
+		@character_list["#{monster.name}"] = monster
+	end
 	
 end
 
 new_game = Game.new
 
+new_game.new_player(Fighter, 'George', 0)
+player = new_game.character_list['George']
+
+new_game.new_monster(Minotaur)
+monster = new_game.character_list['Minotaur']
+
 guide = DungeonMaster.new
-player = Mage.new('Thaddeus', 0)
-monster = Minotaur.new
+
+#player = Mage.new('Thaddeus', 0)
 
 puts "npc Flag: #{player.npc}"
 puts "counter: #{new_game.turn_counter}"
