@@ -29,9 +29,9 @@ playerChar.status_check
 computerChar = Mage.new('Elrich', 1)
 puts computerChar.status_check
 
-playerChar.castSpell('heal', playerChar)
+playerChar.cast_spell('heal', playerChar)
 playerChar.attack(computerChar)
-computerChar.castSpell('fireball', playerChar)
+computerChar.cast_spell('fireball', playerChar)
 playerChar.attack(computerChar)
 computerChar.attack(playerChar)
 playerChar.attack(computerChar)

@@ -3,8 +3,8 @@ require "qwertyio"
 
 class Character
 
-include Magic
-include QwertyIO
+	include Magic
+	include QwertyIO
 
 	def initialize (inName, npcFlag)
 		@name = inName
@@ -20,9 +20,10 @@ include QwertyIO
 		@expValue = 1
 		@alive = true
 		@inventory = {'potion' => Item.new(0), 'weapon' => Item.new(0), 'armor' => Item.new(0)}
+		@spell_list = []
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory, :npc
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory, :npc, :spell_list
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
@@ -114,7 +115,7 @@ include QwertyIO
 		@expValue += 1
 	end
 	
-	def castSpell(spell_name, target)
+	def cast_spell(spell_name, target)
 		manage_output("#{name} casts #{spell_name}.")
 		spell_effect = spells[spell_name]
 		if self.currentMP < spell_effect['mp']
@@ -122,13 +123,14 @@ include QwertyIO
 		else
 			self.mp=(spell_effect['mp'])
 			target.hp=(spell_effect['target_hp'])
-			print "#{target.name} "
+			effect_string = "#{target.name} "
 			if (spell_effect['target_hp']) > 0
-				print 'gains '
+				effect_string += 'gains '
 			elsif (spell_effect['target_hp']) < 0
-				print 'loses '
+				effect_string += 'loses '
 			end
-			manage_output("#{(spell_effect['target_hp']).abs} hit points!")
+			effect_string += "#{(spell_effect['target_hp']).abs} hit points!"
+			manage_output(effect_string)
 		end
 	end
 	
@@ -212,6 +214,8 @@ class Mage < Character
 		@currentHP = @maxHP
 		@maxMP += 8
 		@currentMP = @maxMP
+		@spell_list << 'fireball'
+		@spell_list << 'heal'
 	end
 	
 	def statsUp

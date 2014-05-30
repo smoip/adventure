@@ -6,6 +6,9 @@
 # or are they a library whose effects are called from a module - both
 
 class Item
+
+	include QwertyIO
+
 	# super class of all items, initializes with name
 	# sends effects to Character
 	
