@@ -25,15 +25,21 @@ class Room
 		@description = 'a room'
 	end
 	
-		attr_accessor :type, :description
+		attr_accessor :type, :description, :occupants
 	
 	def describe(name)
 		manage_output("#{name} enters #{@description}.")
-		# also tell what's inside
+		# unless @occupants.length == 1 maybe not 1?
+		# Adds a string which identifies which monsters (if any) are present.
+		# needs a function to remove player from occupant list
+		# then needs to check if occupant monsters are alive
+		# conditional text added if not i.e. 'a dead monster.name'
+		
+		# later add what item(s) are inside
 	end
 	
 	def creature_inside
-		# is someone home?
+		# hello?
 		if rand(5) == 0
 			return true
 		else
@@ -42,7 +48,7 @@ class Room
 	end
 	
 	def treasure_inside
-		# is there booty?
+		# booty?
 		if rand(8) == 0
 			return true
 		else

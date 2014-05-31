@@ -240,6 +240,16 @@ class Minotaur < Character
 	end
 end
 
+class GiantRat < Character
+	
+	def initialize
+		super('Giant Rat', 1)
+		@maxHP -= 2
+		@currentHP = @maxHP
+		@maxMP -= 10
+		@currentMP = @maxMP
+	end
+end
 #--------------------
 
 

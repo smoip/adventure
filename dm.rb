@@ -6,7 +6,6 @@
 # dm reports to user whether a move is valid
 # dm tells map that character has moved
 # handles narration and color text
-# dm could handle leveling up?
 
 class DungeonMaster
 
@@ -25,12 +24,30 @@ class DungeonMaster
 		manage_output("What does #{player.name} do?")
 	end
 
+	def move_character_to_room(character)
+		@character_list.delete(character.name)
+		current_location.occupants["#{character.name}"] = character
+	end
+
+	def move_character_from_room(character)
+		current_location.occupants.delete(character.name)
+		@character_list["#{character.name}"] = character
+	end	
+	
+	def initial_room(player)
+		new_room(true, self)
+		move_character_to_room(player)
+	end
+	
 	def player_moves(player)
 		manage_output('Move in which direction?')
 		direction = manage_input(['forward', 'backward', 'cancel'])
 		if direction == 'cancel'
 			return false
 		end
+		
+		move_character_from_room(player)
+		
 		if direction == 'forward'
 			@map_location += 1
 		elsif direction == 'backward'
@@ -44,6 +61,7 @@ class DungeonMaster
 				# is this a thing?
 				caller.quit_game
 			elsif input == no
+				move_character_to_room(player)
 				return false
 			end
 		end
@@ -52,11 +70,13 @@ class DungeonMaster
 			new_room(false, self)
 		end
 		
+		move_character_to_room(player)
+		# moves player from dm character list to room occupants list
+		
 		room = current_location
 		# who decides what's inside?
-		if room.creatures_inside == true
+		if room.creature_inside == true
 			monster = choose_monster(player)
-		end
 		end
 		# room.treasure_inside
 		room.describe(player.name)
@@ -80,12 +100,20 @@ class DungeonMaster
 		@map_list[@map_location]
 	end
 	
+	def monster_table
+		monster_table = [Minotaur, GiantRat]
+	end
+	
+	def monster_type(monster_table)
+		monster_table.shuffle.first
+	end
+	
 	def choose_monster(player)
-		monster_table = [Minotaur]
 		# this is a problem - needs to call a method from Game
 		# should call Game.new_monster to place creature in characterlist
 		# might have to move new_monster and new_character to dm
-		monster = monster_table.shuffle.first(new)
+		
+		monster = new_monster(monster_type(monster_table))
 		level = (player.level + (rand(4)-1))
 		if level < 0
 			level == 0
@@ -93,6 +121,10 @@ class DungeonMaster
 		level.times do
 			monster.level_up
 		end
+		
+		move_character_to_room(monster)
+		# moves monster from dm character list to room occupants list
+		
 	end
 	
 	def new_room(entrance_flag, dungeon_master)
@@ -280,6 +312,15 @@ class DungeonMaster
 		return battle_order
 	end
 	
+	def new_player(type, name, npc)
+		player = type.new(name, npc)
+		character_list["#{player.name}"] = player
+	end
+	
+	def new_monster(type)
+		monster = type.new
+		character_list["#{monster.name}"] = monster
+	end
 	
 end
 

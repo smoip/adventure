@@ -8,17 +8,17 @@ describe Game do
 		
 		
 		guide = DungeonMaster.new
-		new_game.new_player(guide, Fighter, 'George', 0)
+		guide.new_player(Fighter, 'George', 0)
 		player = guide.character_list['George']
 		
 		player.name.must_equal 'George'
 		
-		new_game.new_monster(guide, Minotaur)
+		guide.new_monster(Minotaur)
 		monster = guide.character_list['Minotaur']
 
 		monster.name.must_equal 'Minotaur'
 		
-		new_game.new_player(guide, Mage, 'Phillip', 0)
+		guide.new_player(Mage, 'Phillip', 0)
 		player_two = guide.character_list['Phillip']
 		player_two.currentHP.must_equal 8
 		player_two.spell_list.must_equal ['fireball', 'heal']
@@ -104,6 +104,12 @@ describe Game do
 		
 		guide.map_location.must_equal 0
 		new_game.turn_counter.must_equal 1
+		
+		puts 'Dm Char list:'
+		guide.character_list.each {|x| puts x.to_s}
+		
+		puts 'Map Char list:'
+		guide.current_location.occupants.each {|x| puts x.to_s}
 		
 	end
 end

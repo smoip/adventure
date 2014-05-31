@@ -35,6 +35,10 @@ class Game
 		@turn_counter += 1
 	end
 	
+	def enter_dungeon(dungeon_master, player)
+		dungeon_master.new_room(player)
+	end
+	
 	def player_action(dungeon_master, player)
 		if player.npc == 0
 			until @turn_counter != 0
@@ -85,15 +89,7 @@ class Game
 # 	Characters cycle through player_action (or a new monster_action) based on Character.initiative
 # 	Once all characters have cycled through, reset turn_counter.
 	
-	def new_player(dungeon_master, type, name, npc)
-		player = type.new(name, npc)
-		dungeon_master.character_list["#{player.name}"] = player
-	end
-	
-	def new_monster(dungeon_master, type)
-		monster = type.new
-		dungeon_master.character_list["#{monster.name}"] = monster
-	end
+
 	
 end
 
