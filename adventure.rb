@@ -78,6 +78,13 @@ class Game
 		end
 	end
 	
+# 	need something that decides active order (inititave)
+# 	the one currently in dm sucks
+# 	maybe dm checks the list of who is currently in the room (room.occupants)
+# 	assigns 1-n to a new attribute (Character.initiative)
+# 	Characters cycle through player_action (or a new monster_action) based on Character.initiative
+# 	Once all characters have cycled through, reset turn_counter.
+	
 	def new_player(dungeon_master, type, name, npc)
 		player = type.new(name, npc)
 		dungeon_master.character_list["#{player.name}"] = player
