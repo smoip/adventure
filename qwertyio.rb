@@ -7,6 +7,9 @@ module QwertyIO
 		until good_answer == true
 			# this is super sloppy and could probably be replaced with .find
 			input = gets.chomp.downcase.strip
+			if good_answers == []
+				return input
+			end
 			indexer = (good_answers.length)
 			indexer.times do
 				indexer -= 1

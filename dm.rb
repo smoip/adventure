@@ -144,8 +144,8 @@ class DungeonMaster
 		[Hallway, Chamber]
 	end
 	
-	def target_options(player, target_self)
-		target_options = @character_list.each_key.collect {|x| x.to_s.downcase }
+	def target_options(player, target_self, room)
+		target_options = room.occupants.each_key.collect {|x| x.to_s.downcase }
 		# turn creature list into array
 		
 		if target_self == false
@@ -161,12 +161,12 @@ class DungeonMaster
 	def player_attacks(player)
 		manage_output('Attack what?')
 		
-		target = target_options(player, false)
+		target = target_options(player, false, current_location)
 		if target == 'cancel'
 			return false
 		end
 		
-		player.attack(@character_list[target.capitalize])
+		player.attack(current_location.occupants[target.capitalize])
 		true
 	end
 	
@@ -202,12 +202,12 @@ class DungeonMaster
 		end
 		
 		manage_output("Cast #{spell} at what target?")
-		target = target_options(player, true)
+		target = target_options(player, true, current_location)
 		if target == 'cancel'
 			return false
 		end
 		
-		player.cast_spell(spell, (@character_list[target.capitalize]))
+		player.cast_spell(spell, (current_location.occupants[target.capitalize]))
 		true
 	end
 	
@@ -310,6 +310,26 @@ class DungeonMaster
 		end
 		manage_output("#{(battle_order[0]).name} moves first!")
 		return battle_order
+	end
+	
+	def beginning_flavor_text(player)
+		manage_output("After months of travelling, #{player.name} finally arrives at some goddamn place or other in search of some goddamn thing or other.")
+	end
+	
+	def playable_characters
+		['fighter','mage']
+	end
+	
+	def new_player_options
+		manage_output('Please choose a class for a new player:')
+		class_type = manage_input(playable_characters).capitalize
+		manage_output("Enter a name for a new #{class_type}:")
+		name = manage_input([])
+		
+		# String.new not allowed.  I solved this problem before - find it
+		player = new_player(class_type, name, 0)
+		manage_output(player.status_check)
+		return player
 	end
 	
 	def new_player(type, name, npc)

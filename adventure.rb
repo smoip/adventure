@@ -35,8 +35,18 @@ class Game
 		@turn_counter += 1
 	end
 	
+	def start_game
+		# initialize game variables, call dm, create character, display opening, create first room
+		guide = DungeonMaster.new
+		player = guide.new_player_options
+		beginning_flavor_text(player)
+		enter_dungeon(guide, player)
+		# now need to incorporate player_action
+		# still need to figure out initiative (as described elsewhere)
+	end
+	
 	def enter_dungeon(dungeon_master, player)
-		dungeon_master.new_room(player)
+		dungeon_master.initial_room(player)
 	end
 	
 	def player_action(dungeon_master, player)

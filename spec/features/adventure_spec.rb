@@ -7,109 +7,122 @@ describe Game do
 		new_game = Game.new
 		
 		
-		guide = DungeonMaster.new
-		guide.new_player(Fighter, 'George', 0)
-		player = guide.character_list['George']
 		
-		player.name.must_equal 'George'
+		manual_dm = DungeonMaster.new
+		manual_dm.new_player(Fighter, 'George', 0)
+		player_one = manual_dm.character_list['George']
 		
-		guide.new_monster(Minotaur)
-		monster = guide.character_list['Minotaur']
+		
+		
+		player_one.name.must_equal 'George'
+		
+		manual_dm.new_monster(Minotaur)
+		monster = manual_dm.character_list['Minotaur']
 
 		monster.name.must_equal 'Minotaur'
 		
-		guide.new_player(Mage, 'Phillip', 0)
-		player_two = guide.character_list['Phillip']
+		manual_dm.new_player(Mage, 'Phillip', 0)
+		player_two = manual_dm.character_list['Phillip']
 		player_two.currentHP.must_equal 8
 		player_two.spell_list.must_equal ['fireball', 'heal']
 				
 		new_game.turn_counter.must_equal 0
-		player.npc.must_equal 0
+		player_one.npc.must_equal 0
 		
 	
 	
-		player.stub :manage_input, 'yes' do
+		player_one.stub :manage_input, 'yes' do
 		# find weapon
-			guide.stub :random_item, Weapon do
-				guide.find_item(player, (rand(5)))
+			manual_dm.stub :random_item, Weapon do
+				manual_dm.find_item(player_one, (rand(5)))
 			end
 		
 		end
 		
-		player.stub :manage_input, 'yes' do
+		player_one.stub :manage_input, 'yes' do
 		# find potion
-			guide.stub :random_item, Potion do
-				guide.find_item(player, (rand(5)))
+			manual_dm.stub :random_item, Potion do
+				manual_dm.find_item(player_one, (rand(5)))
 			end
 		
 		end
 		
-		player.stub :manage_input, 'yes' do
+		player_one.stub :manage_input, 'yes' do
 		# find armor
-			guide.stub :random_item, Armor do
-				guide.find_item(player, (rand(5)))
+			manual_dm.stub :random_item, Armor do
+				manual_dm.find_item(player_one, (rand(5)))
 			end
 		
 		end
 		
 		player_two.stub :manage_input, 'yes' do
 		# find potion
-			guide.stub :random_item, Potion do
-				guide.find_item(player_two, (rand(5)))
+			manual_dm.stub :random_item, Potion do
+				manual_dm.find_item(player_two, (rand(5)))
 			end
 		
 		end
 		
-		guide.new_room(true, guide)
-		guide.new_room(false, guide)
-		(guide.map_list[0]).type.must_equal 'entrance'
-		puts guide.map_list[1].description
+		manual_dm.new_room(true, manual_dm)
+		manual_dm.new_room(false, manual_dm)
+		(manual_dm.map_list[0]).type.must_equal 'entrance'
+		puts manual_dm.map_list[1].description
 		
 	
 		new_game.stub :manage_input, 'move' do
-			guide.stub :manage_input, 'forward' do
-				new_game.player_action(guide, player)
+			manual_dm.stub :manage_input, 'forward' do
+				new_game.player_action(manual_dm, player_one)
 			end
 		end
 		
-		guide.map_list.length.must_equal 2
-		guide.map_location.must_equal 1
+		manual_dm.map_list.length.must_equal 2
+		manual_dm.map_location.must_equal 1
 		
 		new_game.turn_counter = 0
-		new_game.turn_counter.must_equal 0
 		
 		new_game.stub :manage_input, 'move' do
-			guide.stub :manage_input, 'backward' do
-				new_game.player_action(guide, player)
+			manual_dm.stub :manage_input, 'backward' do
+				new_game.player_action(manual_dm, player_one)
+			end
+		end
+		
+		new_game.turn_counter = 0
+		
+		new_game.stub :manage_input, 'move' do
+			manual_dm.stub :manage_input, 'forward' do
+				new_game.player_action(manual_dm, player_one)
 			end
 		end
 	
 # 		new_game.stub :manage_input, 'item' do
-# 			new_game.player_action(guide, player)
+# 			new_game.player_action(manual_dm, player_one)
 # 		end
 	
 # 		new_game.stub :manage_input, 'spell' do
-# 			new_game.player_action(guide, player)
+# 			new_game.player_action(manual_dm, player_one)
 # 		end
 		
 # 		new_game.stub :manage_input, ('attack') do
-# 			guide.stub :manage_input, ('minotaur') do
-# 				new_game.player_action(guide, player)
+# 			manual_dm.stub :manage_input, ('minotaur') do
+# 				new_game.player_action(manual_dm, player_one)
 # 			end
 # 		end
 
 # 		new_game.stub :manage_input, 'spell' do
-# 			new_game.player_action(guide, player_two)
+# 			new_game.player_action(manual_dm, player_two)
 # 		end
 		
-		guide.map_location.must_equal 0
+		manual_dm.map_location.must_equal 1
 		new_game.turn_counter.must_equal 1
 		
 		puts 'Dm Char list:'
-		guide.character_list.each {|x| puts x.to_s}
+		manual_dm.character_list.each {|x| puts x.to_s}
 		
 		puts 'Map Char list:'
-		guide.current_location.occupants.each {|x| puts x.to_s}
+		manual_dm.current_location.occupants.each {|x| puts x.to_s}
+		
+		another_game = Game.new
+		another_game.start_game
 		
 	end
 end
