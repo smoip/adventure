@@ -225,6 +225,11 @@ class Mage < Character
 		@defensePoints += 1
 	end
 	
+	def status_check
+		status = super 
+		status << ["Spells: #{@spell_list.each {|x| x.to_s}}"]
+		status
+	end
 end
 
 class Minotaur < Character

@@ -122,7 +122,10 @@ describe Game do
 		manual_dm.current_location.occupants.each {|x| puts x.to_s}
 		
 		another_game = Game.new
+		
 		another_game.start_game
+		
+		
 		
 	end
 end

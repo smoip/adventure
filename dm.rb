@@ -316,17 +316,22 @@ class DungeonMaster
 		manage_output("After months of travelling, #{player.name} finally arrives at some goddamn place or other in search of some goddamn thing or other.")
 	end
 	
-	def playable_characters
-		['fighter','mage']
+	def playable_characters_name
+		['fighter', 'mage']
+	end
+	
+	def playable_characters(name_string)
+		definitions = {'fighter' => Fighter,'mage' => Mage}
+		definitions[name_string]
 	end
 	
 	def new_player_options
 		manage_output('Please choose a class for a new player:')
-		class_type = manage_input(playable_characters).capitalize
+		class_type = playable_characters(manage_input(playable_characters_name))
 		manage_output("Enter a name for a new #{class_type}:")
-		name = manage_input([])
+		name = manage_input([]).capitalize
 		
-		# String.new not allowed.  I solved this problem before - find it
+		# String.new not allowed.  I solved this problem before - find it. SOLVED MOTHAFUCKA
 		player = new_player(class_type, name, 0)
 		manage_output(player.status_check)
 		return player

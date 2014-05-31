@@ -39,10 +39,18 @@ class Game
 		# initialize game variables, call dm, create character, display opening, create first room
 		guide = DungeonMaster.new
 		player = guide.new_player_options
-		beginning_flavor_text(player)
+		guide.beginning_flavor_text(player)
 		enter_dungeon(guide, player)
 		# now need to incorporate player_action
 		# still need to figure out initiative (as described elsewhere)
+	end
+	
+	def end_game
+		!player
+		!guide
+		# is this a thing?
+		manage_output('Your journey has ended.')
+		exit
 	end
 	
 	def enter_dungeon(dungeon_master, player)
