@@ -67,7 +67,7 @@ class Character
 				manage_output(target.name + " takes #{self.attackPoints} damage!")
 				target.hp=(-(self.attackPoints))
 					unless target.alive
-						gainExp(target.expValue)
+						gain_exp(target.expValue)
 					end
 			else
 				manage_output(self.name + ' misses!')
@@ -77,37 +77,37 @@ class Character
 		end
 	end
 	
-	def gainExp amount
+	def gain_exp amount
 		# adds exp to total
 		# only prints for player character
-		unless @npc == true
+		unless @npc == 1
 			manage_output("#{name} gains #{amount} experience.")
 		end
 		@charExp += amount
-		levelCheck
+		level_check
 	end
 	
-	def levelCheck
+	def level_check
 		# checks current exp against level up table
 		# performs level up if applicable
 		if @level < (@charExp/10)
-			levelUp
+			level_up
 		end
 	end
 	
-	def levelUp
+	def level_up
 		while level < (@charExp/10)
-			unless @npc == true
+			unless @npc == 1
 			# don't print npc level up info
 				manage_output(self.name + ' gains a level!')
 			end
 			@level += 1
 			@charExp -= (@level * 10)
-			statsUp
+			stats_up
 		end
 	end
 		
-	def statsUp
+	def stats_up
 		@maxHP += 2
 		@maxMP += 2
 		@attackPoints += 1
@@ -197,7 +197,7 @@ class Fighter < Character
 		@defensePoints += 1
 	end
 
-	def statsUp
+	def stats_up
 		@maxHP += 3
 		@maxMP += 1
 		@attackPoints += 2
@@ -218,7 +218,7 @@ class Mage < Character
 		@spell_list << 'heal'
 	end
 	
-	def statsUp
+	def stats_up
 		@maxHP += 1
 		@maxMP += 3
 		@attackPoints += 2

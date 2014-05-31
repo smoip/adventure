@@ -16,9 +16,10 @@ class DungeonMaster
 	@game_items = []
 	@character_list = {}
 	@map_list = []
+	@map_location = 0
 	end
 
-	attr_accessor :game_items, :character_list, :map_list
+	attr_accessor :game_items, :character_list, :map_list, :map_location
 
 	def ask_player(player)
 		manage_output("What does #{player.name} do?")
@@ -30,6 +31,37 @@ class DungeonMaster
 		if direction == 'cancel'
 			return false
 		end
+		if direction == 'forward'
+			@map_location += 1
+		elsif direction == 'backward'
+			@map_location -= 1
+		end
+		
+		if @map_location < 0
+			manage_output "Leave the dungeon (and quit the game?)"
+			input = manage_input(['yes', 'no'])
+			if input == yes
+				# is this a thing?
+				caller.quit_game
+			elsif input == no
+				return false
+			end
+		end
+		
+		if @map_location > @map_list.length
+			new_room(false, self)
+		end
+		
+		room = current_location
+		# who decides what's inside?
+		if room.creatures_inside == true
+			monster = choose_monster(player)
+		end
+		end
+		# room.treasure_inside
+		room.describe(player.name)
+		
+		
 # 		if forward ...
 # 		increment a placement counter
 # 		if backward...
@@ -42,6 +74,25 @@ class DungeonMaster
 # 		call some descriptive text from room.description
 # 		manage_output("#{player.name} moves.")
 		true
+	end
+	
+	def current_location
+		@map_list[@map_location]
+	end
+	
+	def choose_monster(player)
+		monster_table = [Minotaur]
+		# this is a problem - needs to call a method from Game
+		# should call Game.new_monster to place creature in characterlist
+		# might have to move new_monster and new_character to dm
+		monster = monster_table.shuffle.first(new)
+		level = (player.level + (rand(4)-1))
+		if level < 0
+			level == 0
+		end
+		level.times do
+			monster.level_up
+		end
 	end
 	
 	def new_room(entrance_flag, dungeon_master)

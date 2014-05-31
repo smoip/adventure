@@ -66,9 +66,23 @@ describe Game do
 		puts guide.map_list[1].description
 		
 	
-# 		new_game.stub :manage_input, 'move' do
-# 			new_game.player_action(guide, player)
-# 		end
+		new_game.stub :manage_input, 'move' do
+			guide.stub :manage_input, 'forward' do
+				new_game.player_action(guide, player)
+			end
+		end
+		
+		guide.map_list.length.must_equal 2
+		guide.map_location.must_equal 1
+		
+		new_game.turn_counter = 0
+		new_game.turn_counter.must_equal 0
+		
+		new_game.stub :manage_input, 'move' do
+			guide.stub :manage_input, 'backward' do
+				new_game.player_action(guide, player)
+			end
+		end
 	
 # 		new_game.stub :manage_input, 'item' do
 # 			new_game.player_action(guide, player)
@@ -78,16 +92,17 @@ describe Game do
 # 			new_game.player_action(guide, player)
 # 		end
 		
-		new_game.stub :manage_input, ('attack') do
-			guide.stub :manage_input, ('minotaur') do
-				new_game.player_action(guide, player)
-			end
-		end
+# 		new_game.stub :manage_input, ('attack') do
+# 			guide.stub :manage_input, ('minotaur') do
+# 				new_game.player_action(guide, player)
+# 			end
+# 		end
 
 # 		new_game.stub :manage_input, 'spell' do
 # 			new_game.player_action(guide, player_two)
 # 		end
 		
+		guide.map_location.must_equal 0
 		new_game.turn_counter.must_equal 1
 		
 	end

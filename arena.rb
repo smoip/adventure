@@ -39,5 +39,5 @@ computerChar.attack(playerChar)
 computerChar.attack(playerChar)
 puts computerChar.status_check.to_s
 
-playerChar.gainExp(20)
+playerChar.gain_exp(20)
 puts playerChar.status_check.to_s

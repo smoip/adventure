@@ -20,15 +20,35 @@ class Room
 
 	def initialize(dungeon_master)
 		@type = 'nothing'
-		@occupants = []
+		@occupants = {}
+		@room_items = {}
 		@description = 'a room'
 	end
 	
 		attr_accessor :type, :description
 	
-	def whats_inside
-		#decide what's in each space
+	def describe(name)
+		manage_output("#{name} enters #{@description}.")
+		# also tell what's inside
 	end
+	
+	def creature_inside
+		# is someone home?
+		if rand(5) == 0
+			return true
+		else
+			return false
+		end
+	end
+	
+	def treasure_inside
+		# is there booty?
+		if rand(8) == 0
+			return true
+		else
+			return false
+		end
+	end 
 	
 end
 
