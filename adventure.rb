@@ -77,6 +77,7 @@ class Game
 	def execute_turn(dungeon_master)
 		(dungeon_master.current_location.occupants.length).times do
 			player = player_order(dungeon_master)
+			puts "player info from adv 79: #{player.name}"
 			player_action(dungeon_master, player)
 			count_game_turn
 		end
@@ -137,7 +138,7 @@ class Game
 			end
 			
 		elsif player.npc == 1
-			dungeon_master.monster_attack
+			dungeon_master.monster_attack(player)
 		end
 		reset_player_turn
 	end

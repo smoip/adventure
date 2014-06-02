@@ -8,13 +8,40 @@ describe Game do
 		
 		
 		
+		
 		manual_dm = DungeonMaster.new
 		manual_dm.new_player(Fighter, 'George', 0)
 		player_one = manual_dm.character_list['George']
 		
-		
-		
 		player_one.name.must_equal 'George'
+		
+		test_room = Room.new(manual_dm)
+		test_room.occupants[player_one.name] = player_one
+		
+		player_type = test_room.occupants[player_one.name].instance_of? Fighter
+		player_type.must_equal true
+		# objects in occupants are players
+		
+		test_table = []
+		
+		manual_dm.stub :current_location, test_room do
+			test_table = manual_dm.initiative_table
+		end
+		
+		name_type = test_table[0].instance_of? String
+		name_type.must_equal true
+		#confirms that returns from initiative_table are name strings from character input
+		
+
+		another_test_player = []
+		
+		manual_dm.stub :current_location, test_room do
+			another_test_player = manual_dm.initiative(0)
+		end
+		
+		another_test_player.name.must_equal 'George'
+		#confirms that returns from initiative are Character objects
+
 		
 		manual_dm.new_monster(Minotaur)
 		monster = manual_dm.character_list['Minotaur']
@@ -26,7 +53,7 @@ describe Game do
 		player_two.currentHP.must_equal 8
 		player_two.spell_list.must_equal ['fireball', 'heal']
 				
-		new_game.turn_counter.must_equal 0
+		new_game.player_turn_counter.must_equal 0
 		player_one.npc.must_equal 0
 		
 	
@@ -78,7 +105,7 @@ describe Game do
 		manual_dm.map_list.length.must_equal 2
 		manual_dm.map_location.must_equal 1
 		
-		new_game.turn_counter = 0
+		new_game.player_turn_counter = 0
 		
 		new_game.stub :manage_input, 'move' do
 			manual_dm.stub :manage_input, 'backward' do
@@ -86,7 +113,7 @@ describe Game do
 			end
 		end
 		
-		new_game.turn_counter = 0
+		new_game.player_turn_counter = 0
 		
 		new_game.stub :manage_input, 'move' do
 			manual_dm.stub :manage_input, 'forward' do
@@ -113,17 +140,18 @@ describe Game do
 # 		end
 		
 		manual_dm.map_location.must_equal 1
-		new_game.turn_counter.must_equal 1
+		new_game.player_turn_counter.must_equal 0
 		
 		puts 'Dm Char list:'
 		manual_dm.character_list.each {|x| puts x.to_s}
 		
 		puts 'Map Char list:'
 		manual_dm.current_location.occupants.each {|x| puts x.to_s}
+
 		
-		another_game = Game.new
-		
-		another_game.start_game
+# 		another_game = Game.new
+# 	
+# 		another_game.start_game
 		
 		
 		

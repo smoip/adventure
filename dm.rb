@@ -37,6 +37,8 @@ class DungeonMaster
 	def initial_room(player)
 		new_room(true, self)
 		move_character_to_room(player)
+		room = current_location
+		room.describe(player.name)
 	end
 	
 	def player_moves(player)
@@ -66,7 +68,7 @@ class DungeonMaster
 			end
 		end
 		
-		if @map_location > @map_list.length
+		if @map_location > (@map_list.length - 1)
 			new_room(false, self)
 		end
 		
@@ -264,59 +266,10 @@ class DungeonMaster
 		turn_order = []
 	end	
 	
-# 	def battle(character_one, character_two)
-# 		# parameters for handling encounters between Characters
-# 		# based on initiative 
-# 		# needs to check to see if character is player or NPC
-# 		# can call NPC behavior if so
-# 		# NPC then needs basic method telling it to attack
-# 		# player character waits for input from 'adventure'
-# 		battle_order = initiative(character_one, character_two)
-# 		if (battle_order[0]).npc == 0
-# 			# first is not npc
-# 			while true
-# 				manage_output("What does #{(battle_order[0]).name} do?")
-# 				# call player attack automated for now
-# 				# player  attacks  monster
-# 				(battle_order[0]).attack(battle_order[1])
-# 				if (battle_order[1]).alive? == false
-# 					(battle_order[0]).gainExp((battle_order[1]).expValue)
-# 					break
-# 				end
-# 				# monster  attacks  player
-# 				(battle_order[1]).attack(battle_order[0])
-# 				if (battle_order[0]).alive? == false
-# 					(battle_order[1]).gainExp((battle_order[0]).expValue)
-# 					break
-# 				end
-# 			end
-# 		elsif (battle_order[0]).npc == 1
-# 			# first is npc
-# 			while true
-# 				# monster  attacks  player
-# 				(battle_order[0]).attack(battle_order[1])
-# 				if (battle_order[1]).alive? == false
-# 					(battle_order[0]).gainExp((battle_order[1]).expValue)
-# 					break
-# 				end
-# 				manage_output("What does #{(battle_order[1]).name} do?")
-# 				# call player attack - automated for now
-# 				# player  attacks  monster
-# 				(battle_order[1]).attack(battle_order[0])
-# 				if (battle_order[0]).alive? == false
-# 					(battle_order[1]).gainExp((battle_order[0]).expValue)
-# 					break
-# 				end				
-# 			end
-# 		end
-# 	end
-	
-	
 	def	initiative_table
 		turn_order = current_location.occupants.each_key.collect {|name| name}
-		turn_order = turn_order.shuffle.first
+		turn_order.shuffle!
 		return turn_order
-		# use current_location.occupants[turn_order[0-n]]
 	end
 	
 	def initiative(game_turn_counter)
