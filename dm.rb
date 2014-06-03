@@ -167,8 +167,15 @@ class DungeonMaster
 		if target == 'cancel'
 			return false
 		end
-		
-		player.attack(current_location.occupants[target.capitalize])
+
+		target = target.partition " "
+		target = target.each.collect {|x| x.capitalize}
+		target_formatted = ""
+		target.each do |x|
+			target_formatted += x
+		end
+
+		player.attack(current_location.occupants[target_formatted])
 		true
 	end
 	
@@ -194,10 +201,26 @@ class DungeonMaster
 		true
 	end
 	
+	def player_lives(player)
+		if player.alive? == false
+			if player.npc == 1
+				valhalla = current_location.occupants.delete(current_location.occupants("#{player.name}"))
+				player.name = "#{player.name}(dead)"
+				current_location.room_items[player.name] = valhalla
+			end
+			if player.npc == 0
+				return true
+			end
+			return false
+		end
+		
+	end
+	
 	def player_casts_spell(player)
-		spell_options = player.spell_list
+		spell_options = player.spell_list.dup
 		spell_options << 'cancel'
 		manage_output('Cast which spell?')
+		
 		spell = manage_input(spell_options)
 		if spell == 'cancel'
 			return false
@@ -209,7 +232,14 @@ class DungeonMaster
 			return false
 		end
 		
-		player.cast_spell(spell, (current_location.occupants[target.capitalize]))
+		target = target.partition " "
+		target = target.each.collect {|x| x.capitalize}
+		target_formatted = ""
+		target.each do |x|
+			target_formatted += x
+		end
+		
+		player.cast_spell(spell, (current_location.occupants[target_formatted]))
 		true
 	end
 	
@@ -250,11 +280,16 @@ class DungeonMaster
 	end
 	
 	def monster_attack(monster)
+		if monster.alive? == false
+			return
+		end
 		indexer = 0
+		occupants_ary = current_location.occupants.to_a.each.collect {|x| x[1]}
 		monster_targets = []
 		current_location.occupants.length.times do
-			target = current_location.occupants[indexer]
+			target = occupants_ary[indexer]
 			if target.npc == 0
+				# target is being pulled as a nil object...
 				monster_targets << target
 			end
 			indexer += 1
@@ -264,9 +299,12 @@ class DungeonMaster
 	
 	def turn_order
 		turn_order = []
-	end	
+	end
 	
 	def	initiative_table
+	# send in a 'last player to move' object and remove that player from the list
+	# that would prevent the same player from getting to go twice
+	# would need error handling for 'nothing' last player
 		turn_order = current_location.occupants.each_key.collect {|name| name}
 		turn_order.shuffle!
 		return turn_order
@@ -276,23 +314,6 @@ class DungeonMaster
 		player = current_location.occupants[(initiative_table[game_turn_counter])]
 		return player
 	end
-	
-# 	def initiative(character_one, character_two)
-# 		# decides which Character attacks first
-# 		# puts characters in an array - returns ordered array to 'battle'
-# 		# q & d implementation - later version could use character stats
-# 		# a later version could use an internal proc to accept a variable number of characters
-# 		battle_order = []
-# 		if rand(2) == 0
-# 			battle_order[0] = character_one
-# 			battle_order[1] = character_two
-# 		else
-# 			battle_order[0] = character_two
-# 			battle_order[1] = character_one
-# 		end
-# 		manage_output("#{(battle_order[0]).name} moves first!")
-# 		return battle_order
-# 	end
 	
 	def beginning_flavor_text(player)
 		manage_output("After months of travelling, #{player.name} finally arrives at some goddamn place or other in search of some goddamn thing or other.")

@@ -23,7 +23,7 @@ class Character
 		@spell_list = []
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :alive, :level, :charExp, :expValue, :npc, :inventory, :npc, :spell_list
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :level, :charExp, :expValue, :npc, :inventory, :npc, :spell_list
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
@@ -61,12 +61,12 @@ class Character
 	end
 	
 	def attack(target)
-		if target.alive
+		if target.alive?
 			manage_output(self.name + ' attacks ' + target.name + '.')
 			if rand(target.defensePoints) == 0		
 				manage_output(target.name + " takes #{self.attackPoints} damage!")
 				target.hp=(-(self.attackPoints))
-					unless target.alive
+					unless target.alive?
 						gain_exp(target.expValue)
 					end
 			else
@@ -121,7 +121,7 @@ class Character
 		if self.currentMP < spell_effect['mp']
 			manage_output('Not enough MP.')
 		else
-			self.mp=(spell_effect['mp'])
+			self.mp=(-(spell_effect['mp']))
 			target.hp=(spell_effect['target_hp'])
 			effect_string = "#{target.name} "
 			if (spell_effect['target_hp']) > 0

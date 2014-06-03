@@ -69,6 +69,10 @@ class Game
 		dungeon_master.initial_room(player)
 	end
 	
+	def living_check(dungeon_master, player)
+		@exit_flag == dungeon_master.player_lives(player)
+	end
+	
 	def player_order(dungeon_master)
 		player = dungeon_master.initiative(@game_turn_counter)
 		return player
@@ -76,9 +80,17 @@ class Game
 	
 	def execute_turn(dungeon_master)
 		(dungeon_master.current_location.occupants.length).times do
+			# return initiative table here?
+			# turn order is screwy - see below
+			# dead things are still in the player list
+			# use a different method to get turn length
+			
 			player = player_order(dungeon_master)
+			# this doesn't necessarily give each player a turn
 			puts "player info from adv 79: #{player.name}"
+			
 			player_action(dungeon_master, player)
+			living_check(dungeon_master, player)
 			count_game_turn
 		end
 	end
@@ -97,6 +109,11 @@ class Game
 		# player_turn_counter might go in here instead of instance var
 		# then call is 0 at start, increment at end
 		# or just reset it to zero at start, call player_action for as many players as there are
+# 		unless player.alive? == true
+# 			reset_player_turn
+# 			return
+# 		end
+# 		too loopish - fix this by popping dead characters out of the player list
 		if player.npc == 0
 			until @player_turn_counter != 0
 				dungeon_master.ask_player(player)

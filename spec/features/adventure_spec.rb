@@ -7,7 +7,15 @@ describe Game do
 		new_game = Game.new
 		
 		
-		
+# 		test_string = "Bat poop"
+# 		test_string = test_string.partition " "
+# 		test_string = test_string.each.collect {|x| x.capitalize}
+# 		out_put = ""
+# 		test_string.each do |x|
+# 			out_put += x
+# 		end
+# 		
+# 		out_put.must_equal "Bat Poop"
 		
 		manual_dm = DungeonMaster.new
 		manual_dm.new_player(Fighter, 'George', 0)
