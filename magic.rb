@@ -1,7 +1,7 @@
 module Magic
 
 	def spells
-		spell_book = {'fireball' => {'target_hp' => -4, 'mp' => 4}, 'heal' => {'target_hp' => 2, 'mp' => 2}}
+		spell_book = {'fireball' => {'target_hp' => -4, 'mp' => 4}, 'heal' => {'target_hp' => 4, 'mp' => 4}, 'lightning' => {'target_hp' => 10, 'mp' => 10}, 'cure' => {'target_hp' => 10, 'mp' => 10}}
 	end
 	
 	def potions

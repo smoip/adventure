@@ -17,13 +17,14 @@ class Character
 		@defensePoints = 1
 		@level = 0
 		@charExp = 0
-		@expValue = 1
+		@exp_value = 1
 		@alive = true
 		@inventory = {'potion' => Item.new(0), 'weapon' => Item.new(0), 'armor' => Item.new(0)}
+		@gold = 0
 		@spell_list = []
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :level, :charExp, :expValue, :npc, :inventory, :npc, :spell_list
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :level, :charExp, :exp_value, :npc, :inventory, :npc, :spell_list, :gold
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
@@ -57,7 +58,7 @@ class Character
 	end
 
 	def status_check
-		["Name: #{name}", "Level: #{level}", "Exp: #{charExp}", "Class: #{self.class}", "Hit Points: #{currentHP}/#{maxHP}", "Magic Points: #{currentMP}/#{maxMP}", "Attack: #{attackPoints}", "Defense: #{defensePoints}"]
+		["Name: #{name}", "Level: #{level}", "Exp: #{charExp}", "Class: #{self.class}", "Hit Points: #{currentHP}/#{maxHP}", "Magic Points: #{currentMP}/#{maxMP}", "Attack: #{attackPoints}", "Defense: #{defensePoints}", "Gold: #{gold}"]
 	end
 	
 	def attack(target)
@@ -67,7 +68,8 @@ class Character
 				manage_output(target.name + " takes #{self.attackPoints} damage!")
 				target.hp=(-(self.attackPoints))
 					unless target.alive?
-						gain_exp(target.expValue)
+						gain_exp(target.exp_value)
+						gain_gold(target.gold_value)
 					end
 			else
 				manage_output(self.name + ' misses!')
@@ -85,6 +87,23 @@ class Character
 		end
 		@charExp += amount
 		level_check
+	end
+	
+	def gain_gold(amount)
+		unless amount == 0
+			unless @npc == 1
+				manage_output("#{name} gains #{amount} gold.")
+			end
+			@gold += amount
+		end
+	end
+	
+	def gold_value
+		value = ((self.level + 1) * (rand(self.exp_value) + 1)) + (rand(4) - 2)
+		if value < 0
+			value = 0
+		end
+		return value
 	end
 	
 	def level_check
@@ -106,31 +125,48 @@ class Character
 			stats_up
 		end
 	end
+	
+	def force_level_up
+		unless @npc == 1
+		# don't print npc level up info
+			manage_output(self.name + ' gains a level!')
+		end
+		@level += 1
+		stats_up
+	end
 		
 	def stats_up
 		@maxHP += 2
 		@maxMP += 2
 		@attackPoints += 1
 		@defensePoints += 1
-		@expValue += 1
+		@exp_value += 1
 	end
 	
 	def cast_spell(spell_name, target)
-		manage_output("#{name} casts #{spell_name}.")
 		spell_effect = spells[spell_name]
 		if self.currentMP < spell_effect['mp']
 			manage_output('Not enough MP.')
 		else
+			manage_output("#{name} casts #{spell_name}.")
 			self.mp=(-(spell_effect['mp']))
-			target.hp=(spell_effect['target_hp'])
+			spell_outcome = spell_effect['target_hp'] + (spell_effect['target_hp']/(spell_effect['target_hp'].abs) * rand(self.level + 1))
 			effect_string = "#{target.name} "
-			if (spell_effect['target_hp']) > 0
+			if spell_outcome > 0
 				effect_string += 'gains '
-			elsif (spell_effect['target_hp']) < 0
+			elsif spell_outcome < 0
 				effect_string += 'loses '
 			end
-			effect_string += "#{(spell_effect['target_hp']).abs} hit points!"
+			effect_string += "#{spell_outcome.abs} hit points!"
 			manage_output(effect_string)
+			
+			target.hp=(spell_outcome)
+			
+			unless target.alive?
+				gain_exp(target.exp_value)
+				gain_gold(target.gold_value)
+			end
+			
 		end
 	end
 	
@@ -149,7 +185,7 @@ class Character
 	end
 	
 	
-	def recieve_item(item)
+	def receive_item(item)
 		manage_output("#{@name} has found #{item.name}.")
 		manage_output("Keep #{item.name} and replace #{(@inventory[item.type]).name}?")
 		response = manage_input(['yes', 'no'])
@@ -223,6 +259,15 @@ class Mage < Character
 		@maxMP += 3
 		@attackPoints += 2
 		@defensePoints += 1
+		new_spells
+	end
+	
+	def new_spells
+		if @level == 4
+			@spell_list << 'lightning'
+			@spell_list << 'cure'
+			manage_output("#{name} has learned new spells!")
+		end
 	end
 	
 	def status_check
@@ -232,6 +277,21 @@ class Mage < Character
 	end
 end
 
+class LizardMan < Character
+
+	def initialize
+		super('Lizard Man', 1)
+		@maxHP += 2
+		@currentHP = @maxHP
+		@maxMP -= 10
+		@attackPoints += 1
+		@defensePoints += 3
+		@currentMP = @maxMP
+		@exp_value += 3
+	end
+	
+end
+
 class Minotaur < Character
 	
 	def initialize
@@ -239,12 +299,26 @@ class Minotaur < Character
 		@maxHP += 5
 		@currentHP = @maxHP
 		@maxMP -= 10
-		@attackPoints += 1
+		@attackPoints += 2
+		@defensePoints += 1
 		@currentMP = @maxMP
-		@expValue += 1
+		@exp_value += 3
 	end
 end
 
+class Skeleton < Character
+
+	def initialize
+		super('Skeleton', 1)
+		@maxHP += 1
+		@currentHP = @maxHP
+		@maxMP -= 10
+		@attackPoints += 1
+		@currentMP = @maxMP
+		@exp_value += 2
+	end
+end
+	
 class GiantRat < Character
 	
 	def initialize
@@ -253,7 +327,20 @@ class GiantRat < Character
 		@currentHP = @maxHP
 		@maxMP -= 10
 		@currentMP = @maxMP
+		@exp_value += 1
 	end
+end
+
+class Slime < Character
+
+	def initialize
+		super('Slime', 1)
+		@maxHP -= 6
+		@currentHP = @maxHP
+		@maxMP -= 10
+		@currentMP = @maxMP
+	end
+	
 end
 #--------------------
 

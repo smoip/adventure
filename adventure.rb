@@ -56,7 +56,7 @@ class Game
 		@dm << guide
 		player = guide.new_player_options
 		guide.beginning_flavor_text(player)
-		enter_dungeon(guide, player)
+		 enter_dungeon_first_time(guide, player)
 		run_game
 	end
 	
@@ -65,12 +65,8 @@ class Game
 		exit
 	end
 	
-	def enter_dungeon(dungeon_master, player)
+	def enter_dungeon_first_time(dungeon_master, player)
 		dungeon_master.initial_room(player)
-	end
-	
-	def living_check(dungeon_master, player)
-		@exit_flag == dungeon_master.player_lives(player)
 	end
 	
 	def player_order(dungeon_master)
@@ -78,20 +74,41 @@ class Game
 		return player
 	end
 	
+	def any_player_chars_left?(dungeon_master)
+		player_chk_ary = dungeon_master.current_location.occupants.each_value.collect {|character| (character.npc - 1).abs}
+		indexer = 0
+		player_flag = 0
+		player_chk_ary.length.times do
+			player_flag += player_chk_ary[indexer]
+			indexer += 1
+		end
+		unless player_flag > 0
+			@exit_flag = true
+			return false
+		end
+		true
+	end
+	
 	def execute_turn(dungeon_master)
-		(dungeon_master.current_location.occupants.length).times do
-			# return initiative table here?
-			# turn order is screwy - see below
-			# dead things are still in the player list
-			# use a different method to get turn length
+		unless any_player_chars_left?(dungeon_master) == false
+			chars_in_room = dungeon_master.current_location.occupants.length
+			chars_in_room.times do
+				# return initiative table here?
+				# turn order is screwy - see below
+				# dead things are still in the player list
+				# use a different method to get turn length
 			
-			player = player_order(dungeon_master)
-			# this doesn't necessarily give each player a turn
-			puts "player info from adv 79: #{player.name}"
+				player = player_order(dungeon_master)
+				# this doesn't necessarily give each player a turn
 			
-			player_action(dungeon_master, player)
-			living_check(dungeon_master, player)
-			count_game_turn
+				player_action(dungeon_master, player)
+				count_game_turn
+			
+				if dungeon_master.current_location.occupants.length != chars_in_room
+					# early return if somebody died as a result of turn action
+					return
+				end
+			end
 		end
 	end
 	
@@ -141,21 +158,37 @@ class Game
 						count_player_turn
 					end
 				end
-			
+				
+				player_take = Proc.new do
+					if dungeon_master.player_takes(player) == true
+						count_player_turn
+					end
+				end
+				
 				player_status = Proc.new do
 					manage_output(player.status_check)
 				end
 				
+				
 				player_inventory = Proc.new do
 					manage_output(player.inventory_check)
 				end
+				
+				player_look = Proc.new do
+					dungeon_master.player_looks(player)
+				end
+				
+				player_rest = Proc.new do
+					dungeon_master.player_rests(player)
+				end
 			
-				action_choice = {'move' => player_move, 'attack' => player_attack, 'item' => player_item, 'spell' => player_spell, 'status' => player_status, 'inventory' => player_inventory}
-				action_choice[manage_input(['move', 'attack', 'item', 'spell', 'status', 'inventory'])].call
+				action_choice = {'move' => player_move, 'm' => player_move, 'attack' => player_attack, 'a' => player_attack, 'item' => player_item, 'i' => player_item, 'spell' => player_spell, 's' => player_spell, 'take' => player_take, 'status' => player_status, 'inventory' => player_inventory, 'look' => player_look, 'rest' => player_rest}
+				action_choice[manage_input(['move', 'm', 'attack', 'a', 'item', 'i', 'spell', 's', 'take', 'status', 'inventory', 'look', 'rest'])].call
 			end
 			
 		elsif player.npc == 1
 			dungeon_master.monster_attack(player)
+			count_player_turn
 		end
 		reset_player_turn
 	end

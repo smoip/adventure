@@ -16,9 +16,18 @@ class DungeonMaster
 	@character_list = {}
 	@map_list = []
 	@map_location = 0
+	@world_map_list = []
+	@world_map_location = 0
 	end
 
 	attr_accessor :game_items, :character_list, :map_list, :map_location
+
+	def wait
+		diff = 0
+		until diff == 10000000
+			diff += 1
+		end
+	end
 
 	def ask_player(player)
 		manage_output("What does #{player.name} do?")
@@ -38,30 +47,50 @@ class DungeonMaster
 		new_room(true, self)
 		move_character_to_room(player)
 		room = current_location
-		room.describe(player.name)
+		room.enter_description(player.name)
+	end
+	
+	def player_looks(player)
+		current_location.describe(player.name)
+		false
 	end
 	
 	def player_moves(player)
 		manage_output('Move in which direction?')
-		direction = manage_input(['forward', 'backward', 'cancel'])
+		
+		# handling for moving from 'outside' space back into dungeon
+		if @map_location < 0
+			direction = manage_input(['dungeon','cancel'])
+			if direction == 'dungeon'
+				move_character_from_room(player)
+				@map_location += 1
+				move_character_to_room(player)
+				current_location.enter_description(player.name)
+				return true
+			elsif direction == 'cancel'
+				return false
+			end
+		end
+
+		direction = manage_input(['forward', 'f', 'backward', 'b', 'cancel'])
 		if direction == 'cancel'
 			return false
 		end
 		
 		move_character_from_room(player)
 		
-		if direction == 'forward'
+		if direction == 'forward' or direction == 'f'
 			@map_location += 1
-		elsif direction == 'backward'
+		elsif direction == 'backward' or direction == 'b'
 			@map_location -= 1
 		end
 		
 		if @map_location < 0
-			manage_output "Leave the dungeon (and quit the game?)"
+			manage_output "Leave the dungeon?"
 			input = manage_input(['yes', 'no'])
-			if input == yes
-				# is this a thing?
-				caller.quit_game
+			if input == 'yes'
+				leave_dungeon(player)
+				return true
 			elsif input == no
 				move_character_to_room(player)
 				return false
@@ -81,39 +110,49 @@ class DungeonMaster
 			monster = choose_monster(player)
 		end
 		# room.treasure_inside
-		room.describe(player.name)
+		room.enter_description(player.name)
 		
-		
-# 		if forward ...
-# 		increment a placement counter
-# 		if backward...
-# 		decrement a placement counter
-# 		check the map_list.length against placement counter
-# 		if placement counter is larger, call a new room (new_room)
-# 		if placement counter is less than or equal, we are now in map_list.index(counter) room
-# 		if placement counter is less than 0, display some text that you are leaving the dungeon (and ending the game)
-# 		still need to figure out what's in the room (use room.occupants)
-# 		call some descriptive text from room.description
-# 		manage_output("#{player.name} moves.")
 		true
 	end
 	
 	def current_location
-		@map_list[@map_location]
+		if @map_location >= 0
+			return @map_list[@map_location]
+		elsif @map_location < 0
+			return @world_map_list[@world_map_location]
+		end
+	end
+	
+	
+	def enter_dungeon(player)
+		manage_output("#{player.name} descends once more into the dungeon's forbidding maw...")
+		move_character_to_room(player)
+	end
+	
+	def leave_dungeon(player)
+		manage_output("#{player.name} climbs the long stair leading out of the dungeon and emerges blinking into the sunlight.")
+		if @world_map_list == []
+			new_outside_space(self)
+		end
+		move_character_to_room(player)
 	end
 	
 	def monster_table
-		monster_table = [Minotaur, GiantRat]
+		monster_table = [Slime, GiantRat, Skeleton, Minotaur, LizardMan]
 	end
 	
 	def monster_type(monster_table)
-		monster_table.shuffle.first
+		# every five rooms shifts down one group of three possible enemies
+		dungeon_depth = @map_location / 5
+		max_length = monster_table.length - 2
+		if dungeon_depth > max_length
+			dungeon_depth = max_length
+		end
+		local_monsters = monster_table.values_at(dungeon_depth..(dungeon_depth + 2)) 
+		local_monsters.shuffle.first
 	end
 	
 	def choose_monster(player)
-		# this is a problem - needs to call a method from Game
-		# should call Game.new_monster to place creature in characterlist
-		# might have to move new_monster and new_character to dm
 		
 		monster = new_monster(monster_type(monster_table))
 		level = (player.level + (rand(4)-1))
@@ -121,7 +160,7 @@ class DungeonMaster
 			level == 0
 		end
 		level.times do
-			monster.level_up
+			monster.force_level_up
 		end
 		
 		move_character_to_room(monster)
@@ -136,6 +175,11 @@ class DungeonMaster
 			room = random_room.new(dungeon_master)
 		end
 		@map_list << room
+	end
+	
+	def new_outside_space(dungeon_master)
+		room = Outside.new(dungeon_master)
+		@world_map_list << room
 	end
 	
 	def random_room
@@ -174,8 +218,13 @@ class DungeonMaster
 		target.each do |x|
 			target_formatted += x
 		end
-
-		player.attack(current_location.occupants[target_formatted])
+		
+		chosen_target = current_location.occupants[target_formatted]
+		player.attack(chosen_target)
+		if check_living(chosen_target) == false
+			character_dies(player, chosen_target)
+		end
+		
 		true
 	end
 	
@@ -201,19 +250,26 @@ class DungeonMaster
 		true
 	end
 	
-	def player_lives(player)
-		if player.alive? == false
-			if player.npc == 1
-				valhalla = current_location.occupants.delete(current_location.occupants("#{player.name}"))
-				player.name = "#{player.name}(dead)"
-				current_location.room_items[player.name] = valhalla
+	def player_takes(player)
+		take_options = current_location.room_items.each do |name, obj|
+			if obj.kind_of?(Item)
+				name
 			end
-			if player.npc == 0
-				return true
-			end
-			return false
 		end
-		
+		take_options << 'cancel'
+		item = manage_input(take_options)
+		take_item(player, item)
+	end
+	
+	def check_living(player)
+		if player.alive? == false
+			valhalla = current_location.occupants.delete("#{player.name}")
+			player.name = "#{player.name}(dead)"
+			current_location.room_items[player.name] = valhalla
+			return false
+		else
+			return true
+		end
 	end
 	
 	def player_casts_spell(player)
@@ -239,12 +295,25 @@ class DungeonMaster
 			target_formatted += x
 		end
 		
-		player.cast_spell(spell, (current_location.occupants[target_formatted]))
+		chosen_target = current_location.occupants[target_formatted]
+		player.cast_spell(spell, (chosen_target))
+		if check_living(chosen_target) == false
+			character_dies(player, chosen_target)
+		end
+		
 		true
 	end
 	
 	def item_type
 		[Potion, Weapon, Armor]
+	end
+	
+	def item_found?
+		if rand(4) == 0
+			return true
+		else
+			return false
+		end
 	end
 	
 	def random_item
@@ -260,23 +329,73 @@ class DungeonMaster
 		@game_items << item
 		# store item
 		
-		character_decision = character.recieve_item(item)
+		take_item(character, item)
+		# splitting this out into another method makes it accessible to 'take'
+	
+	end
+	
+	def take_item(character, item)
+		
+		character_decision = character.receive_item(item)
 		
 		if (character_decision[0]) == true
 			@game_items.pop
 			if character_decision[1].type != 'nothing'
-				@game_items << (character_decision[1])
+				current_location.room_items[(character_decision[1]).name] = character_decision[1]
 			end		
+		elsif (character_decision[0]) == false
+			left_item = @game_items.pop
+			current_location.room_items[left_item.name] = left_item
 		end
-	
+		
 	end
 	
-	def drop_item(item)
+	def player_rests(player)
+		hp_diff = player.maxHP - player.currentHP
+		mp_diff = player.maxMP - player.currentMP
+		if hp_diff >= mp_diff
+			rest_time = hp_diff
+		elsif mp_diff > hp_diff
+			rest_time = mp_diff
+		end
+		
+		wake_up = false
+		manage_output("#{player.name} nods off...")
+		rest_time.times do
+			player.hp=(1)
+			player.mp=(1)
+			wait
+			manage_output('...')
+			unless current_location.type == 'outside'
+				if rand(3) == 0
+					wake_up = true
+					monster = choose_monster(player)
+					manage_output("#{player.name} is woken suddenly by a #{monster.name}!")
+					monster_attack(monster)
+				end
+			end
+			if wake_up == true
+				return true
+			end
+		end
+		manage_output("#{player.name} awakes, feeling refreshed.")
+		true
+	end
+	
+	def drop_item(player, item)
+		# take item from player.inventory and put in room_items
 	end
 	
 	def check_game_items
 		manage_output("Game Items: ")
 		@game_items.each { |x| manage_output(x.name) }
+	end
+	
+	def character_dies(slayer, slain)
+		if item_found?
+			manage_output("The #{slain.name} drops an item!")
+			find_item(slayer, slain.level)
+		end
 	end
 	
 	def monster_attack(monster)
@@ -294,7 +413,13 @@ class DungeonMaster
 			end
 			indexer += 1
 		end
-		monster.attack(monster_targets.shuffle.first)
+		chosen_target = monster_targets.shuffle.first
+		if chosen_target == nil
+			return
+		end
+		monster.attack(chosen_target)
+		check_living(chosen_target)
+		wait
 	end
 	
 	def turn_order
