@@ -265,8 +265,13 @@ class DungeonMaster
 	def player_takes(player)
 	
 		indexer = 0
-		items_ary = current_location.room_items.to_a.each.collect {|x| x[1] if x[1].kind_of? Item}
-		# convert room_items to array, remove 'name' key, return Object only if type is Item
+		
+		items_hsh = current_location.room_items.dup
+		items_hsh.delete_if {|name, object| object.kind_of? Character }
+		# remove dead bodies from list
+		items_ary = items_hsh.to_a.each.collect {|x| x[1] }
+		# convert room_items to array, remove 'name' key, return Object only
+		
 
 		take_options = []
 		if items_ary == []
@@ -274,13 +279,18 @@ class DungeonMaster
 			return
 		end
 		items_ary.length.times do
-				take_options << items_ary[indexer].name
+				take_options << (items_ary[indexer]).name
 			indexer += 1
 		end
 
 		take_options << 'cancel'
+		manage_output('Take what?')
 		item = current_location.room_items[manage_input(take_options)]
-		take_item(player, item)
+		unless item == nil
+			current_location.room_items.delete(item.name)
+			@game_items << item
+			take_item(player, item)
+		end
 	end
 	
 	def check_living(player)

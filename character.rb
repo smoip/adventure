@@ -276,7 +276,6 @@ class Character
 		temp_array = []
 		temp_array[(attr_list[type])] = amount
 
-		puts "before assignment #{ap_mod}"
 		if type == 'attack'
 			@ap_mod = temp_array[0]
 		end
@@ -286,7 +285,7 @@ class Character
 		if type == 'agility'
 			@ag_mod = temp_array[2]
 		end
-		puts "after assignment #{ap_mod}"
+
 	end
 	
 	
@@ -531,6 +530,7 @@ class LizardMan < Character
 	def stats_up
 		super
 		@agility += 1
+		@defensePoints += 1
 	end
 end
 
@@ -581,6 +581,11 @@ class Serpent < Character
 		@attackPoints += 1
 		@attackPoints -= 1
 		@exp_value += 2
+	end
+	
+	def stats_up
+		super
+		@agility += 1
 	end
 end
 	

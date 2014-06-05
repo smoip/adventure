@@ -147,6 +147,28 @@ class Chamber < Room
 
 end
 
+class Hoard < Room
+
+	def initialize(dungeon_master)
+		super
+		@type = 'hoard'
+		# once in a while (after a certain depth) players should
+		# encounter a room with treasures and extra monsters guarding them
+	end
+
+end
+
+class Keep < Room
+	
+	def initialize
+		super
+		@type = 'keep'
+		# once in a great while (after a certain depth) players should
+		# find a room that can be 'secured' after killing any monsters and is safe to rest in.
+	end
+	
+end
+
 class Entrance < Room
 	
 	def initialize(dungeon_master)

@@ -125,6 +125,9 @@ class Game
 # 			return
 # 		end
 # 		too loopish - fix this by popping dead characters out of the player list
+		if player == nil
+			return
+		end
 		if player.npc == 0
 			until @player_turn_counter != 0
 				dungeon_master.ask_player(player)
