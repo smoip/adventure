@@ -84,7 +84,8 @@ class DungeonMaster
 				# turn creature list into array
 				monster_options.delete_at(monster_options.index(player.name))
 				# remove player from actionable options
-				monster_attack(monster_options.shuffle.first)
+				monster_attack(current_location.occupants[monster_options.shuffle.first])
+				# use name as key to current_location occupants
 			end
 		end
 		
