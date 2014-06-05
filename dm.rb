@@ -80,7 +80,7 @@ class DungeonMaster
 		if current_location.occupants.length > 1
 			if rand(2 + player.agility) == 0
 				manage_output "#{player.name} is attacked while fleeing the #{current_location.type}!"
-				monster_options = room.occupants.each_key.collect {|x| x }
+				monster_options = current_location.occupants.each_key.collect {|x| x }
 				# turn creature list into array
 				monster_options.delete_at(monster_options.index(player.name))
 				# remove player from actionable options
