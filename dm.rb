@@ -149,7 +149,7 @@ class DungeonMaster
 	end
 	
 	def monster_table
-		monster_table = [Slime, GiantRat, Serpent, Skeleton, Minotaur, LizardMan]
+		monster_table = [Slime, GiantRat, Serpent, Skeleton, Minotaur, LizardMan, DemiLich]
 	end
 	
 	def monster_type(monster_table)

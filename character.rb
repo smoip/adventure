@@ -388,6 +388,10 @@ class LizardMan < Character
 		@exp_value += 3
 	end
 	
+	def stats_up
+		super
+		@agility += 1
+	end
 end
 
 class Minotaur < Character
@@ -402,6 +406,12 @@ class Minotaur < Character
 		@defensePoints += 1
 		@currentMP = @maxMP
 		@exp_value += 3
+	end
+	
+	def stats_up
+		super
+		@maxHP += 1
+		@currentHP = @maxHP
 	end
 end
 
