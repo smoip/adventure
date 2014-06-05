@@ -42,38 +42,6 @@ class Character
 		end
 	end
 	
-	def store_temp_mod(type, amount, duration)
-		@spell_modifiers[type] = [amount, duration]
-		# this should be the only place mods get applied
-		attr_list = {'attack' => @ap_mod, 'defense' => @dp_mod, 'agility' => @ag_mod}
-		attr_list[type] = amount 
-		manage_output("#{@name} is enchanted!")
-	end
-	
-	
-	def count_temp_mod
-		
-		attr_list = {'attack' => @ap_mod, 'defense' => @dp_mod, 'agility' => @ag_mod}
-		un_apply_flag = false
-		
-		['attack','defense','agility'].each do |x|
-			unless @spell_modifiers[x[1]] == 0
-				@spell_modifiers[x[1]] -= 1
-				if @spell_modifiers[x[1]] < 0
-					@spell_modifiers[x[1]] = 0
-				end
-				if @spell_modifiers[x[1]] = 0
-					attr_list[x] = 0
-					un_apply_flag == true
-				end
-			end
-		end
-		
-		if un_apply_flag == true
-			manage_output("An enchantment has faded from #{@name}.")
-		end
-		
-	end
 	
 	def hp=(amount)
 		@currentHP += amount
@@ -97,15 +65,26 @@ class Character
 	end
 
 	def status_check
-		["Name: #{name}", "Level: #{level}", "Exp: #{charExp}", "Class: #{self.class}", "Hit Points: #{currentHP}/#{maxHP}", "Magic Points: #{currentMP}/#{maxMP}", "Attack: #{attackPoints}", "Defense: #{defensePoints}", "Agility: #{agility}", "Gold: #{gold}"]
+		status = ["Name: #{name}", "Level: #{level}", "Exp: #{charExp}", "Class: #{self.class}", "Hit Points: #{currentHP}/#{maxHP}", "Magic Points: #{currentMP}/#{maxMP}", "Attack: #{real_attack_points}", "Defense: #{real_defense_points}", "Agility: #{real_agility_points}", "Gold: #{gold}"]
+		if @spell_list != []
+			status << ["Spells: #{@spell_list.each {|x| x.to_s}}"]
+		end
+		status
+	end
+	
+	def learn_spell(spell)
+		@spell_list << spell
+		unless @npc == 1
+			manage_output("#{@name} has learned the spell #{spell}!")
+		end
 	end
 	
 	def hit_ratio(target)
 		hit_ratio = 0
-		if @agility > target.agility
+		if real_agility_points > target.real_agility_points
 			hit_ratio = 1
-		elsif @agility <= target.agility
-			hit_ratio = target.agility - @agility
+		elsif real_agility_points <= target.real_agility_points
+			hit_ratio = target.real_agility_points - real_agility_points
 			if hit_ratio < 2
 				hit_ratio = 2
 			end
@@ -114,7 +93,7 @@ class Character
 	end
 	
 	def damage_amount(target)
-		damage = self.attackPoints - (target.defensePoints/2)
+		damage = real_attack_points - (target.real_defense_points/2)
 		if damage <= 0
 			damage = 1
 		end
@@ -203,6 +182,35 @@ class Character
 		@defensePoints += 1
 		@agility += 1
 		@exp_value += 1
+		new_spells
+	end
+	
+	def new_spells
+		# not everybody learns spells... sad
+	end
+	
+	def real_attack_points
+		ap = @attackPoints + @ap_mod
+		if ap < 0
+			ap = 0
+		end
+		return ap
+	end
+	
+	def real_defense_points
+		dp = @defensePoints + @dp_mod
+		if dp < 0
+			dp = 0
+		end
+		return dp
+	end
+	
+	def real_agility_points
+		ag = @agility + @ag_mod
+		if ag < 0
+			ag = 0
+		end
+		return ag
 	end
 	
 	def cast_spell(spell_name, target)
@@ -218,9 +226,9 @@ class Character
 			manage_output("#{name} casts #{spell_name}.")
 			self.mp=(-(spell_effect['mp']))
 			
-			if spells_effect['target_hp'] != nil
+			if spell_effect['target_hp'] != nil
 				hp_spell(spell_effect, target)
-			elsif spells_effect['target_hp'] == nil
+			elsif spell_effect['target_hp'] == nil
 				temp_spell(spell_effect, target)
 			end
 			
@@ -257,6 +265,63 @@ class Character
 				duration = spell_effect['duration'] + rand(self.level + 1)
 				target.store_temp_mod(type, amount, duration)
 			end
+		end
+		manage_output("#{@name} is enchanted!")
+	end
+	
+	def store_temp_mod(type, amount, duration)
+		@spell_modifiers[type] = [amount, duration]
+		# this should be the only place mods get applied
+		attr_list = {'attack' => 0, 'defense' => 1, 'agility' => 2}
+		temp_array = []
+		temp_array[(attr_list[type])] = amount
+
+		puts "before assignment #{ap_mod}"
+		if type == 'attack'
+			@ap_mod = temp_array[0]
+		end
+		if type == 'defense'
+			@dp_mod = temp_array[1]
+		end
+		if type == 'agility'
+			@ag_mod = temp_array[2]
+		end
+		puts "after assignment #{ap_mod}"
+	end
+	
+	
+	def count_temp_mod
+		
+		attr_list = {'attack' => @ap_mod, 'defense' => @dp_mod, 'agility' => @ag_mod}
+		un_apply_flag = false
+		
+		['attack','defense','agility'].each do |x|
+			unless @spell_modifiers[x][1] == 0
+				puts @spell_modifiers[x][1]
+				@spell_modifiers[x][1] -= 1
+				if @spell_modifiers[x][1] < 0
+					@spell_modifiers[x][1] = 0
+				end
+				if @spell_modifiers[x][1] == 0
+					remove_temp_mod(x)
+					un_apply_flag = true
+				end
+			end
+		end
+		if un_apply_flag == true
+			manage_output("An enchantment has faded from #{@name}.")
+		end	
+	end
+	
+	def remove_temp_mod(type)
+		if type == 'attack'
+			@ap_mod = 0
+		end
+		if type == 'defense'
+			@dp_mod = 0
+		end
+		if type == 'agility'
+			@ag_mod = 0
 		end
 	end
 	
@@ -330,18 +395,9 @@ class Fighter < Character
 		@agility += 1
 	end
 	
-	def status_check
-		status = super 
-		if spell_list != []
-			status << ["Spells: #{@spell_list.each {|x| x.to_s}}"]
-		end
-		status
-	end
-	
 	def new_spells
 		if @level == 10
-			@spell_list << 'heal'
-			manage_output("#{name} has learned new spells!")
+			learn_spell('heal')
 		end
 	end
 	
@@ -357,7 +413,6 @@ class Mage < Character
 		@currentMP = @maxMP
 		@spell_list << 'fireball'
 		@spell_list << 'heal'
-		@spell_list << 'weakness'
 	end
 	
 	def stats_up
@@ -370,18 +425,20 @@ class Mage < Character
 	end
 	
 	def new_spells
+		if @level == 2
+			learn_spell('lightning')
+		end
 		if @level == 4
-			@spell_list << 'lightning'
-			@spell_list << 'cure'
-			manage_output("#{name} has learned new spells!")
+			learn_spell('cure')
+		end
+		if @level == 6
+			learn_spell('strength')
+		end
+		if @level == 8
+			learn_spell('weakness')
 		end
 	end
 	
-	def status_check
-		status = super 
-		status << ["Spells: #{@spell_list.each {|x| x.to_s}}"]
-		status
-	end
 end
 
 class Thief < Character
@@ -404,17 +461,8 @@ class Thief < Character
 	
 	def new_spells
 		if @level == 6
-			@spell_list << 'heal'
-			manage_output("#{name} has learned new spells!")
+			learn_spell(heal)
 		end
-	end
-	
-	def status_check
-		status = super 
-		if spell_list != []
-			status << ["Spells: #{@spell_list.each {|x| x.to_s}}"]
-		end
-		status
 	end
 	
 end
@@ -436,7 +484,8 @@ class GreenDragon
 	def stats_up
 		super
 		@defensePoints += 2
-		@maxHP += 3
+		@maxHP += 2
+		@currentHP = @maxHP
 	end
 
 end
@@ -452,8 +501,17 @@ class DemiLich < Character
 		@currentMP = @maxMP
 		@exp_value += 4
 		@spell_list << 'fireball'
-		@spell_list << 'weakness'
 	end
+
+	def new_spells
+		if @level == 4
+			learn_spell('weakness')
+		end
+		if @level == 6
+			learn_spell('lightning')
+		end
+	end
+
 end
 
 class LizardMan < Character
