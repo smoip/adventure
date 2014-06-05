@@ -16,6 +16,9 @@ class Character
 		@attackPoints = 1
 		@defensePoints = 1
 		@agility = 1
+		@ap_mod = 0
+		@dp_mod = 0
+		@ag_mod = 0
 		@level = 0
 		@charExp = 0
 		@exp_value = 1
@@ -23,9 +26,12 @@ class Character
 		@inventory = {'potion' => Item.new(0), 'weapon' => Item.new(0), 'armor' => Item.new(0)}
 		@gold = 0
 		@spell_list = []
+		@spell_modifiers = {'attack' => [0, 0], 'defense' => [0, 0], 'agility' => [0, 0]}
+		# spell mod - reference by mod attr, ary[0] is modifier, ary[1] is turns left (counted by count_player_turn)
+		# and reset by 'rest'
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :agility, :level, :charExp, :exp_value, :npc, :inventory, :npc, :spell_list, :gold
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :agility, :level, :charExp, :exp_value, :npc, :inventory, :npc, :spell_list, :gold, :spell_modifiers, :ap_mod, :dp_mod, :ag_mod
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
@@ -36,6 +42,38 @@ class Character
 		end
 	end
 	
+	def store_temp_mod(type, amount, duration)
+		@spell_modifiers[type] = [amount, duration]
+		# this should be the only place mods get applied
+		attr_list = {'attack' => @ap_mod, 'defense' => @dp_mod, 'agility' => @ag_mod}
+		attr_list[type] = amount 
+		manage_output("#{@name} is enchanted!")
+	end
+	
+	
+	def count_temp_mod
+		
+		attr_list = {'attack' => @ap_mod, 'defense' => @dp_mod, 'agility' => @ag_mod}
+		un_apply_flag = false
+		
+		['attack','defense','agility'].each do |x|
+			unless @spell_modifiers[x[1]] == 0
+				@spell_modifiers[x[1]] -= 1
+				if @spell_modifiers[x[1]] < 0
+					@spell_modifiers[x[1]] = 0
+				end
+				if @spell_modifiers[x[1]] = 0
+					attr_list[x] = 0
+					un_apply_flag == true
+				end
+			end
+		end
+		
+		if un_apply_flag == true
+			manage_output("An enchantment has faded from #{@name}.")
+		end
+		
+	end
 	
 	def hp=(amount)
 		@currentHP += amount
@@ -179,28 +217,48 @@ class Character
 		else
 			manage_output("#{name} casts #{spell_name}.")
 			self.mp=(-(spell_effect['mp']))
-			spell_outcome = spell_effect['target_hp'] + (spell_effect['target_hp']/(spell_effect['target_hp'].abs) * rand(self.level + 1))
-			effect_string = "#{target.name} "
-			if spell_outcome > 0
-				effect_string += 'gains '
-			elsif spell_outcome < 0
-				effect_string += 'loses '
-			end
-			effect_string += "#{spell_outcome.abs} hit points!"
-			manage_output(effect_string)
 			
-			target.hp=(spell_outcome)
-			
-			unless target.alive?
-				gain_exp(target.exp_value)
-				gain_gold(target.gold_value)
+			if spells_effect['target_hp'] != nil
+				hp_spell(spell_effect, target)
+			elsif spells_effect['target_hp'] == nil
+				temp_spell(spell_effect, target)
 			end
+			
 			if @npc == 1
 				return true
 			end
 		end
 	end
 	
+	def hp_spell(spell_effect, target)
+		spell_outcome = spell_effect['target_hp'] + (spell_effect['target_hp']/(spell_effect['target_hp'].abs) * rand(self.level + 1))
+		effect_string = "#{target.name} "
+		if spell_outcome > 0
+			effect_string += 'gains '
+		elsif spell_outcome < 0
+			effect_string += 'loses '
+		end
+		effect_string += "#{spell_outcome.abs} hit points!"
+		manage_output(effect_string)
+		
+		target.hp=(spell_outcome)
+		
+		unless target.alive?
+			gain_exp(target.exp_value)
+			gain_gold(target.gold_value)
+		end
+	end
+	
+	def temp_spell(spell_effect, target)
+	
+		['attack', 'defense', 'agility'].each do |type|
+			unless spell_effect[type] == nil
+				amount = spell_effect[type] + (spell_effect[type]/(spell_effect[type].abs) * rand(self.level + 1))
+				duration = spell_effect['duration'] + rand(self.level + 1)
+				target.store_temp_mod(type, amount, duration)
+			end
+		end
+	end
 	
 	def use_potion(potion_name)
 		if (@inventory['potion']).sub_type.to_s == potion_name
@@ -299,6 +357,7 @@ class Mage < Character
 		@currentMP = @maxMP
 		@spell_list << 'fireball'
 		@spell_list << 'heal'
+		@spell_list << 'weakness'
 	end
 	
 	def stats_up
@@ -360,6 +419,28 @@ class Thief < Character
 	
 end
 
+class GreenDragon
+
+	def initialize
+		super('Green Dragon', 1)
+		@maxHP += 2
+		@currentHP = @maxHP
+		@attackPoints += 2
+		@defensePoints += 2
+		@currentMP = @maxMP
+		@agility += 1
+		@exp_value += 5
+		@spell_list << 'fire_breath'
+	end
+
+	def stats_up
+		super
+		@defensePoints += 2
+		@maxHP += 3
+	end
+
+end
+
 class DemiLich < Character
 
 	def initialize
@@ -371,6 +452,7 @@ class DemiLich < Character
 		@currentMP = @maxMP
 		@exp_value += 4
 		@spell_list << 'fireball'
+		@spell_list << 'weakness'
 	end
 end
 
