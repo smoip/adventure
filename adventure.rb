@@ -69,11 +69,6 @@ class Game
 		dungeon_master.initial_room(player)
 	end
 	
-	def player_order(dungeon_master)
-		player = dungeon_master.initiative(@game_turn_counter)
-		return player
-	end
-	
 	def any_player_chars_left?(dungeon_master)
 		player_chk_ary = dungeon_master.current_location.occupants.each_value.collect {|character| (character.npc - 1).abs}
 		indexer = 0
@@ -92,20 +87,17 @@ class Game
 	def execute_turn(dungeon_master)
 		unless any_player_chars_left?(dungeon_master) == false
 			chars_in_room = dungeon_master.current_location.occupants.length
+			table = dungeon_master.initiative_table
 			chars_in_room.times do
-				# return initiative table here?
-				# turn order is screwy - see below
-				# dead things are still in the player list
-				# use a different method to get turn length
-			
-				player = player_order(dungeon_master)
-				# this doesn't necessarily give each player a turn
+				
+				player = dungeon_master.initiative(@game_turn_counter, table)
 			
 				player_action(dungeon_master, player)
 				count_game_turn
-			
+				
 				if dungeon_master.current_location.occupants.length != chars_in_room
 					# early return if somebody died as a result of turn action
+					# is also called when a new creatures appears as a result of movement
 					return
 				end
 			end

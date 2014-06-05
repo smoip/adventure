@@ -15,6 +15,7 @@ class Character
 		@currentMP = maxMP
 		@attackPoints = 1
 		@defensePoints = 1
+		@agility = 1
 		@level = 0
 		@charExp = 0
 		@exp_value = 1
@@ -24,7 +25,7 @@ class Character
 		@spell_list = []
 	end
 	
-	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :level, :charExp, :exp_value, :npc, :inventory, :npc, :spell_list, :gold
+	attr_accessor :name, :maxHP, :currentHP, :maxMP, :currentMP, :attackPoints, :defensePoints, :agility, :level, :charExp, :exp_value, :npc, :inventory, :npc, :spell_list, :gold
 	# same as defining methods to write/return @name, @currentHP, etc.
 	
 	def alive?
@@ -58,15 +59,37 @@ class Character
 	end
 
 	def status_check
-		["Name: #{name}", "Level: #{level}", "Exp: #{charExp}", "Class: #{self.class}", "Hit Points: #{currentHP}/#{maxHP}", "Magic Points: #{currentMP}/#{maxMP}", "Attack: #{attackPoints}", "Defense: #{defensePoints}", "Gold: #{gold}"]
+		["Name: #{name}", "Level: #{level}", "Exp: #{charExp}", "Class: #{self.class}", "Hit Points: #{currentHP}/#{maxHP}", "Magic Points: #{currentMP}/#{maxMP}", "Attack: #{attackPoints}", "Defense: #{defensePoints}", "Agility: #{agility}", "Gold: #{gold}"]
+	end
+	
+	def hit_ratio(target)
+		hit_ratio = 0
+		if @agility > target.agility
+			hit_ratio = 1
+		elsif @agility <= target.agility
+			hit_ratio = target.agility - @agility
+			if hit_ratio < 2
+				hit_ratio = 2
+			end
+		end
+		return hit_ratio
+	end
+	
+	def damage_amount(target)
+		damage = self.attackPoints - (target.defensePoints/2)
+		if damage <= 0
+			damage = 1
+		end
+		return damage
 	end
 	
 	def attack(target)
 		if target.alive?
 			manage_output(self.name + ' attacks ' + target.name + '.')
-			if rand(target.defensePoints) == 0		
-				manage_output(target.name + " takes #{self.attackPoints} damage!")
-				target.hp=(-(self.attackPoints))
+			if rand(hit_ratio(target)) == 0
+				damage = damage_amount(target)
+				manage_output(target.name + " takes #{damage} damage!")
+				target.hp=(-(damage))
 					unless target.alive?
 						gain_exp(target.exp_value)
 						gain_gold(target.gold_value)
@@ -140,13 +163,19 @@ class Character
 		@maxMP += 2
 		@attackPoints += 1
 		@defensePoints += 1
+		@agility += 1
 		@exp_value += 1
 	end
 	
 	def cast_spell(spell_name, target)
 		spell_effect = spells[spell_name]
 		if self.currentMP < spell_effect['mp']
-			manage_output('Not enough MP.')
+			unless @npc == 1
+				manage_output('Not enough MP.')
+			end
+			if @npc == 1
+				return false
+			end
 		else
 			manage_output("#{name} casts #{spell_name}.")
 			self.mp=(-(spell_effect['mp']))
@@ -166,7 +195,9 @@ class Character
 				gain_exp(target.exp_value)
 				gain_gold(target.gold_value)
 			end
-			
+			if @npc == 1
+				return true
+			end
 		end
 	end
 	
@@ -229,15 +260,31 @@ class Fighter < Character
 		@currentHP = @maxHP
 		@maxMP -= 5
 		@currentMP = @maxMP
-		@attackPoints += 1
-		@defensePoints += 1
+		@attackPoints += 2
+		@defensePoints += 2
 	end
 
 	def stats_up
 		@maxHP += 3
 		@maxMP += 1
 		@attackPoints += 2
-		@defensePoints += 2
+		@defensePoints += 1
+		@agility += 1
+	end
+	
+	def status_check
+		status = super 
+		if spell_list != []
+			status << ["Spells: #{@spell_list.each {|x| x.to_s}}"]
+		end
+		status
+	end
+	
+	def new_spells
+		if @level == 10
+			@spell_list << 'heal'
+			manage_output("#{name} has learned new spells!")
+		end
 	end
 	
 end
@@ -256,9 +303,10 @@ class Mage < Character
 	
 	def stats_up
 		@maxHP += 1
-		@maxMP += 3
-		@attackPoints += 2
+		@maxMP += 4
+		@attackPoints += 1
 		@defensePoints += 1
+		@agility += 1
 		new_spells
 	end
 	
@@ -277,11 +325,61 @@ class Mage < Character
 	end
 end
 
+class Thief < Character
+	
+	def initialize inName, npcFlag
+		super
+		@defensePoints += 1
+		@agility += 4
+	end
+	
+	def stats_up
+		@maxHP += 2
+		@maxMP += 1
+		@attackPoints += 1
+		@defensePoints += 1
+		@agility += 3
+		@exp_value += 1
+		new_spells
+	end
+	
+	def new_spells
+		if @level == 6
+			@spell_list << 'heal'
+			manage_output("#{name} has learned new spells!")
+		end
+	end
+	
+	def status_check
+		status = super 
+		if spell_list != []
+			status << ["Spells: #{@spell_list.each {|x| x.to_s}}"]
+		end
+		status
+	end
+	
+end
+
+class DemiLich < Character
+
+	def initialize
+		super('Demi Lich', 1)
+		@maxHP += 2
+		@currentHP = @maxHP
+		@attackPoints += 1
+		@defensePoints += 1
+		@currentMP = @maxMP
+		@exp_value += 4
+		@spell_list << 'fireball'
+	end
+end
+
 class LizardMan < Character
 
 	def initialize
 		super('Lizard Man', 1)
-		@maxHP += 2
+		@agility += 2
+		@maxHP += 1
 		@currentHP = @maxHP
 		@maxMP -= 10
 		@attackPoints += 1
@@ -296,6 +394,7 @@ class Minotaur < Character
 	
 	def initialize
 		super('Minotaur', 1)
+		@agility -= 1
 		@maxHP += 5
 		@currentHP = @maxHP
 		@maxMP -= 10
@@ -310,11 +409,27 @@ class Skeleton < Character
 
 	def initialize
 		super('Skeleton', 1)
+		@agility += 1
 		@maxHP += 1
 		@currentHP = @maxHP
 		@maxMP -= 10
 		@attackPoints += 1
 		@currentMP = @maxMP
+		@exp_value += 2
+	end
+end
+
+class Serpent < Character
+	
+	def initialize
+		super('Serpent', 1)
+		@agility += 1
+		@maxHP -= 2
+		@currentHP = @maxHP
+		@maxMP -= 10
+		@currentMP = @maxMP
+		@attackPoints += 1
+		@attackPoints -= 1
 		@exp_value += 2
 	end
 end
@@ -335,6 +450,7 @@ class Slime < Character
 
 	def initialize
 		super('Slime', 1)
+		@agility -= 1
 		@maxHP -= 6
 		@currentHP = @maxHP
 		@maxMP -= 10

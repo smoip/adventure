@@ -72,16 +72,27 @@ class DungeonMaster
 			end
 		end
 
-		direction = manage_input(['forward', 'f', 'backward', 'b', 'cancel'])
+		direction = manage_input(['north', 'n', 'south', 's', 'cancel'])
 		if direction == 'cancel'
 			return false
 		end
 		
+		if current_location.occupants.length > 1
+			if rand(2 + player.agility) == 0
+				manage_output "#{player.name} is attacked while fleeing the #{current_location.type}!"
+				monster_options = room.occupants.each_key.collect {|x| x }
+				# turn creature list into array
+				monster_options.delete_at(monster_options.index(player.name))
+				# remove player from actionable options
+				monster_attack(monster_options.shuffle.first)
+			end
+		end
+		
 		move_character_from_room(player)
 		
-		if direction == 'forward' or direction == 'f'
+		if direction == 'north' or direction == 'n'
 			@map_location += 1
-		elsif direction == 'backward' or direction == 'b'
+		elsif direction == 'south' or direction == 's'
 			@map_location -= 1
 		end
 		
@@ -138,17 +149,17 @@ class DungeonMaster
 	end
 	
 	def monster_table
-		monster_table = [Slime, GiantRat, Skeleton, Minotaur, LizardMan]
+		monster_table = [Slime, GiantRat, Serpent, Skeleton, Minotaur, LizardMan]
 	end
 	
 	def monster_type(monster_table)
 		# every five rooms shifts down one group of three possible enemies
-		dungeon_depth = @map_location / 5
+		dungeon_depth = @map_location / 10
 		max_length = monster_table.length - 2
 		if dungeon_depth > max_length
 			dungeon_depth = max_length
 		end
-		local_monsters = monster_table.values_at(dungeon_depth..(dungeon_depth + 2)) 
+		local_monsters = monster_table.values_at((dungeon_depth)..(dungeon_depth + 2))
 		local_monsters.shuffle.first
 	end
 	
@@ -251,13 +262,23 @@ class DungeonMaster
 	end
 	
 	def player_takes(player)
-		take_options = current_location.room_items.each do |name, obj|
-			if obj.kind_of?(Item)
-				name
-			end
+	
+		indexer = 0
+		items_ary = current_location.room_items.to_a.each.collect {|x| x[1] if x[1].kind_of? Item}
+		# convert room_items to array, remove 'name' key, return Object only if type is Item
+
+		take_options = []
+		if items_ary == []
+			manage_output('There is nothing to take...')
+			return
 		end
+		items_ary.length.times do
+				take_options << items_ary[indexer].name
+			indexer += 1
+		end
+
 		take_options << 'cancel'
-		item = manage_input(take_options)
+		item = current_location.room_items[manage_input(take_options)]
 		take_item(player, item)
 	end
 	
@@ -393,7 +414,7 @@ class DungeonMaster
 	
 	def character_dies(slayer, slain)
 		if item_found?
-			manage_output("The #{slain.name} drops an item!")
+			manage_output("#{slayer.name} finds something on the body of the #{slain.name}!")
 			find_item(slayer, slain.level)
 		end
 	end
@@ -417,15 +438,22 @@ class DungeonMaster
 		if chosen_target == nil
 			return
 		end
-		monster.attack(chosen_target)
+		
+		if monster.spell_list != []
+			monster_spell = monster.spell_list.shuffle.first
+			if monster.cast_spell(monster_spell, chosen_target) == false
+				monster.attack(chosen_target)
+			end
+			
+		else
+			monster.attack(chosen_target)
+		end
+		
 		check_living(chosen_target)
 		wait
 	end
 	
-	def turn_order
-		turn_order = []
-	end
-	
+
 	def	initiative_table
 	# send in a 'last player to move' object and remove that player from the list
 	# that would prevent the same player from getting to go twice
@@ -435,8 +463,8 @@ class DungeonMaster
 		return turn_order
 	end
 	
-	def initiative(game_turn_counter)
-		player = current_location.occupants[(initiative_table[game_turn_counter])]
+	def initiative(game_turn_counter, table)
+		player = current_location.occupants[(table[game_turn_counter])]
 		return player
 	end
 	
@@ -445,11 +473,11 @@ class DungeonMaster
 	end
 	
 	def playable_characters_name
-		['fighter', 'mage']
+		['fighter', 'mage', 'thief']
 	end
 	
 	def playable_characters(name_string)
-		definitions = {'fighter' => Fighter,'mage' => Mage}
+		definitions = {'fighter' => Fighter,'mage' => Mage, 'thief' => Thief}
 		definitions[name_string]
 	end
 	

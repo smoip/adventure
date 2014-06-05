@@ -65,7 +65,6 @@ describe Game do
 		player_one.npc.must_equal 0
 		
 	
-	
 		player_one.stub :manage_input, 'yes' do
 		# find weapon
 			manual_dm.stub :random_item, Weapon do
@@ -109,6 +108,12 @@ describe Game do
 				new_game.player_action(manual_dm, player_one)
 			end
 		end
+		
+# 		another_item = Potion.new(1)
+# 		manual_dm.current_location.room_items[another_item.name] = another_item
+# 		new_game.stub :manage_input, 'take' do
+# 			new_game.player_action(manual_dm, player_one)
+# 		end
 		
 		manual_dm.map_list.length.must_equal 2
 		manual_dm.map_location.must_equal 1
