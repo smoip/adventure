@@ -149,7 +149,7 @@ class DungeonMaster
 	end
 	
 	def monster_table
-		monster_table = [Slime, GiantRat, Serpent, Skeleton, Minotaur, LizardMan, DemiLich]
+		monster_table = [Slime, GiantRat, Serpent, Skeleton, Minotaur, LizardMan, DemiLich, GreenDragon]
 	end
 	
 	def monster_type(monster_table)
@@ -380,12 +380,18 @@ class DungeonMaster
 			rest_time = mp_diff
 		end
 		
+		if current_location.occupants.length > 1
+			manage_output("#{player.name} cannot rest while there are enemies about!")
+			return true
+		end
+		
 		wake_up = false
 		manage_output("#{player.name} nods off...")
 		rest_time.times do
 			player.hp=(1)
 			player.mp=(1)
 			wait
+			player.count_temp_mod
 			manage_output('...')
 			unless current_location.type == 'outside'
 				if rand(3) == 0

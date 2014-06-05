@@ -36,6 +36,8 @@ class Game
 	
 	def count_player_turn
 		@player_turn_counter += 1
+		# call temp_mod_checks
+		@dm[0].current_location.occupants.each_value {|character| character.count_temp_mod}
 	end
 	
 	def reset_player_turn
