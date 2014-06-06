@@ -12,7 +12,7 @@ class Item
 	# super class of all items, initializes with name
 	# sends effects to Character
 	
-	def initialize(item_lev)
+	def initialize(item_lev, local_depth)
 		@type = 'nothing'
 		@sub_type = 'nothing'
 		@name = 'nothing'
@@ -34,7 +34,7 @@ class Potion < Item
 	# for now, level does nothing
 	
 	
-	def initialize(item_lev)
+	def initialize(item_lev, local_depth)
 		super
 		@type = 'potion'
 		@sub_type_list = ['healing potion', 'magic potion']
@@ -53,11 +53,18 @@ class Weapon < Item
 	# persistent item, modifies attackPoints
 	# persistent items need an owner
 	
-	def initialize(item_lev)
+	def initialize(item_lev, local_depth)
 		super
 		@type = 'weapon'
-		@sub_type_list = ['dagger', 'axe', 'sword']
-		@sub_type = @sub_type_list.shuffle.first
+		@sub_type_list = ['dagger', 'short sword', 'axe', 'long sword', 'great axe', 'great sword']
+		
+		max_length = @sub_type_list.length - 2
+		local_depth
+		if local_depth > max_length
+			local_depth = max_length
+		end
+		local_weapons = @sub_type_list.values_at((local_depth)..(local_depth + 2))
+		@sub_type = local_weapons.shuffle.first
 		@name = "#{@sub_type} + #{item_lev}"
 	end
 
@@ -73,10 +80,18 @@ class Armor < Item
 	# persistent item, modifies defensePoints
 	# persistent items need an owner
 	
-	def initialize(item_lev)
+	def initialize(item_lev, local_depth)
 		super
 		@type = 'armor'
-		@sub_type_list = ['leather armor', 'chain mail', 'plate armor']
+		@sub_type_list = ['leather shirt', 'leather armor', 'chain shirt', 'plate shirt', 'full chain suit', 'full plate armor']
+		max_length = @sub_type_list.length - 2
+		local_depth
+		if local_depth > max_length
+			local_depth = max_length
+		end
+		local_armor = @sub_type_list.values_at((local_depth)..(local_depth + 2))
+		@sub_type = local_armor.shuffle.first
+		@name = "#{@sub_type} + #{item_lev}"
 		@sub_type = @sub_type_list.shuffle.first
 		@name = "#{@sub_type} + #{item_lev}"
 	end

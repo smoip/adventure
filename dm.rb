@@ -149,18 +149,23 @@ class DungeonMaster
 		move_character_to_room(player)
 	end
 	
+	def dungeon_depth
+		depth = @map_location / 10
+		return depth
+	end
+	
 	def monster_table
 		monster_table = [Slime, GiantRat, Serpent, Skeleton, Minotaur, LizardMan, DemiLich, GreenDragon]
 	end
 	
 	def monster_type(monster_table)
-		# every five rooms shifts down one group of three possible enemies
-		dungeon_depth = @map_location / 10
+		# every ten rooms shifts down one group of three possible enemies
 		max_length = monster_table.length - 2
-		if dungeon_depth > max_length
-			dungeon_depth = max_length
+		local_depth = dungeon_depth
+		if local_depth > max_length
+			local_depth = max_length
 		end
-		local_monsters = monster_table.values_at((dungeon_depth)..(dungeon_depth + 2))
+		local_monsters = monster_table.values_at((local_depth)..(local_depth + 2))
 		local_monsters.shuffle.first
 	end
 	
@@ -355,7 +360,8 @@ class DungeonMaster
 	def find_item(character, item_level)
 		# decides what type of item has been found
 		
-		item = random_item.new(item_level)
+		depth = dungeon_depth
+		item = random_item.new(item_level, depth)
 		# call Item.new with the appropriate info
 		
 		@game_items << item

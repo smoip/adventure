@@ -23,7 +23,7 @@ class Character
 		@charExp = 0
 		@exp_value = 1
 		@alive = true
-		@inventory = {'potion' => Item.new(0), 'weapon' => Item.new(0), 'armor' => Item.new(0)}
+		@inventory = {'potion' => Item.new(0, 0), 'weapon' => Item.new(0, 0), 'armor' => Item.new(0, 0)}
 		@gold = 0
 		@spell_list = []
 		@spell_modifiers = {'attack' => [0, 0], 'defense' => [0, 0], 'agility' => [0, 0]}
@@ -239,7 +239,7 @@ class Character
 	end
 	
 	def hp_spell(spell_effect, target)
-		spell_outcome = spell_effect['target_hp'] + (spell_effect['target_hp']/(spell_effect['target_hp'].abs) * rand(self.level + 1))
+		spell_outcome = spell_effect['target_hp'] + (spell_effect['target_hp']/(spell_effect['target_hp'].abs) * (rand(self.level + 1)* (spell_effect['target_hp']/4)))
 		effect_string = "#{target.name} "
 		if spell_outcome > 0
 			effect_string += 'gains '
@@ -261,8 +261,8 @@ class Character
 	
 		['attack', 'defense', 'agility'].each do |type|
 			unless spell_effect[type] == nil
-				amount = spell_effect[type] + (spell_effect[type]/(spell_effect[type].abs) * rand(self.level + 1))
-				duration = spell_effect['duration'] + rand(self.level + 1)
+				amount = spell_effect[type] + (spell_effect[type]/(spell_effect[type].abs) * (rand(self.level + 1)* (spell_effect[type]/4)))
+				duration = spell_effect['duration'] + (rand(self.level + 1) * (spell_effect[type]/4))
 				target.store_temp_mod(type, amount, duration)
 			end
 		end
@@ -296,7 +296,6 @@ class Character
 		
 		['attack','defense','agility'].each do |x|
 			unless @spell_modifiers[x][1] == 0
-				puts @spell_modifiers[x][1]
 				@spell_modifiers[x][1] -= 1
 				if @spell_modifiers[x][1] < 0
 					@spell_modifiers[x][1] = 0
@@ -445,7 +444,7 @@ class Thief < Character
 	def initialize inName, npcFlag
 		super
 		@defensePoints += 1
-		@agility += 4
+		@agility += 2
 	end
 	
 	def stats_up
@@ -453,7 +452,7 @@ class Thief < Character
 		@maxMP += 1
 		@attackPoints += 1
 		@defensePoints += 1
-		@agility += 3
+		@agility += 2
 		@exp_value += 1
 		new_spells
 	end
