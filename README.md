@@ -27,4 +27,4 @@ I am still very much in the process of learning testing (both syntax and usage),
 
 Future Features:
 
-Planned later features include: two dimensional map support, a shop (or town) in which players can spend their accumulated gold, an algorithmically generated 8-bit soundtrack using Scruby (Csound), new room types including ‘secure chamber’ where players can safely rest and a ‘hoard’ which is defended by several monsters and contains a special treasure, and of course more monsters, booty, and character types.
+Planned later features include: two dimensional map support, a shop (or town) in which players can spend their accumulated gold, an algorithmically generated 8-bit soundtrack using Scruby (Super Collider), new room types including ‘secure chamber’ where players can safely rest and a ‘hoard’ which is defended by several monsters and contains a special treasure, and of course more monsters, booty, and character types.
