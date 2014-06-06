@@ -52,10 +52,34 @@ class Game
 		@game_turn_counter = 0
 	end
 	
+	def welcome_text
+		manage_output('  ___  ______  _   _  _____  _   _  _____  _   _ ______  _____ 
+ / _ \ |  _  \| | | ||  ___|| \ | ||_   _|| | | || ___ \|  ___|
+/ /_\ \| | | || | | || |__  |  \| |  | |  | | | || |_/ /| |__  
+|  _  || | | || | | ||  __| | . ` |  | |  | | | ||    / |  __| 
+| | | || |/ / \ \_/ /| |___ | |\  |  | |  | |_| || |\ \ | |___ 
+\_| |_/|___/   \___/ \____/ \_| \_/  \_/   \___/ \_| \_|\____/ 
+                                                               
+                                                              ')
+    	manage_output('           /\
+ _         )( _________________________________
+(_)///////(**)_________________________________>
+           )(
+           \/')
+    	manage_output('')
+    	manage_output('by David Roberts')
+    	manage_output('v1.0')
+    	manage_output('')
+    	manage_output('press \'enter\' to begin')
+    	manage_input([])
+    	manage_output('Welcome to Adventure!')
+	end
+	
 	def start_game
 		# initialize game variables, call dm, create character, display opening, create first room
 		guide = DungeonMaster.new
 		@dm << guide
+		welcome_text
 		player = guide.new_player_options
 		guide.beginning_flavor_text(player)
 		 enter_dungeon_first_time(guide, player)

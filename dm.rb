@@ -492,8 +492,13 @@ class DungeonMaster
 	end
 	
 	def beginning_flavor_text(player)
-		manage_output("After months of travelling, #{player.name} finally arrives at some goddamn place or other in search of some goddamn thing or other.")
+		manage_output("")
+		manage_output("After months of travelling and many hardships, #{player.name} finally arrives at the entrance to the fabled Dungeon.  What horrors lurk within?  What treasures lie hidden deep inside?  There is only one way to find out...")
+		manage_output("Go forth, #{player.name}!  Slay fell beasts!  Plunder the depths!  Adventure mightily!")
+		manage_output("")
 	end
+	
+	# 
 	
 	def playable_characters_name
 		['fighter', 'mage', 'thief']
