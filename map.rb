@@ -174,7 +174,7 @@ class Entrance < Room
 	def initialize(dungeon_master)
 		super
 		@type = 'entrance'
-		@description = 'the entrance to the dungeon'
+		@description = 'the doorway to the dungeon'
 	end
 	
 end
