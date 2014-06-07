@@ -28,7 +28,9 @@ class Room
 		attr_accessor :type, :description, :occupants, :room_items
 	
 	def enter_description(name)
-		descriptor_string = "#{name} enters #{@description}"
+		descriptor_string = "#{name} " 
+		descriptor_string += ["enters ", "passes into ", "steps into "].shuffle.first
+		descriptor_string += "#{@description}"
 		if @occupants.length >= 2
 			indexer = 0
 			occupants_ary = @occupants.to_a.each.collect {|x| x[1]}
@@ -40,7 +42,9 @@ class Room
 				end
 				indexer += 1
 			end
-			descriptor_string += " and encounters"
+			
+			descriptor_string += [" and encounters", " and confronts", " and is waylaid by"].shuffle.first
+			
 			indexer = 0
 			npc_occupants.length.times do
 				if indexer >= 1 
@@ -124,9 +128,9 @@ class Hallway < Room
 	def initialize(dungeon_master)
 		super
 		@type = 'hallway'
-		@sub_type_one_list = ['narrow,', 'broad,', 'steep,']
+		@sub_type_one_list = ['narrow,', 'broad,', 'steep,', 'lengthy,', 'short,']
 		@sub_type_one = @sub_type_one_list.shuffle.first
-		@sub_type_two_list = ['twisting', 'straight', 'gently curving']
+		@sub_type_two_list = ['twisting', 'straight', 'gently curving', 'smooth']
 		@sub_type_two = @sub_type_two_list.shuffle.first
 		@description = "a #{@sub_type_one} #{@sub_type_two} hallway"
 	end
@@ -138,13 +142,15 @@ class Chamber < Room
 	def initialize(dungeon_master)
 		super
 		@type = 'chamber'
-		@sub_type_one_list = ['long,', 'compact,', 'cavernous,']
+		@sub_type_one_list = ['long,', 'compact,', 'cavernous,', 'small,', 'wide,', 'rough-hewn,']
 		@sub_type_one = @sub_type_one_list.shuffle.first
-		@sub_type_two_list = ['vaulted', 'high-ceilinged', 'dusty']
+		@sub_type_two_list = ['vaulted', 'high-ceilinged', 'dusty', 'damp', 'low', 'echoing']
 		@sub_type_two = @sub_type_two_list.shuffle.first
-		@description = "a #{@sub_type_one} #{@sub_type_two} chamber"	
+		@sub_type_three_list = ['', 'littered with old, yellowed bones', '', "with strange symbols carved into the walls", '', 'dominated by a grotesque statue carved from a cold, black stone', '', 'in the center of which yawns a deep, open pit']
+		@sub_type_three = @sub_type_three_list.shuffle.first
+		@description = "a #{@sub_type_one} #{@sub_type_two} chamber #{@sub_type_three}"	
 	end
-
+	
 end
 
 class Hoard < Room

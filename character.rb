@@ -266,7 +266,7 @@ class Character
 				target.store_temp_mod(type, amount, duration)
 			end
 		end
-		manage_output("#{@name} is enchanted!")
+		manage_output("#{target.name} is enchanted!")
 	end
 	
 	def store_temp_mod(type, amount, duration)
