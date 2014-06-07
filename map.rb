@@ -146,7 +146,7 @@ class Chamber < Room
 		@sub_type_one = @sub_type_one_list.shuffle.first
 		@sub_type_two_list = ['vaulted', 'high-ceilinged', 'dusty', 'damp', 'low', 'echoing']
 		@sub_type_two = @sub_type_two_list.shuffle.first
-		@sub_type_three_list = ['', 'littered with old, yellowed bones', '', "with strange symbols carved into the walls", '', 'dominated by a grotesque statue carved from a cold, black stone', '', 'in the center of which yawns a deep, open pit']
+		@sub_type_three_list = ['', "littered with #{['old, yellowed', 'unnervingly fresh-looking'].shuffle.first} bones", '', "with #{['strange', 'ominous', 'spidery'].shuffle.first} symbols #{['carved into', 'chiseled into', 'scrawled across' ].shuffle.first} the walls", '', "dominated by a #{['grotesque', 'large', 'crumbling'].shuffle.first} statue carved from #{['cold, black stone', 'faintly luminescent rock', 'an oozing porous substance'].shuffle.first}", '', "in the center of which #{['yawns a deep, open pit', 'stretches a large, jagged crack', 'sits a worn, stained block'].shuffle.first}"]
 		@sub_type_three = @sub_type_three_list.shuffle.first
 		@description = "a #{@sub_type_one} #{@sub_type_two} chamber #{@sub_type_three}"	
 	end
