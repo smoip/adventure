@@ -103,7 +103,7 @@ class DungeonMaster
 			if input == 'yes'
 				leave_dungeon(player)
 				return true
-			elsif input == no
+			elsif input == 'no'
 				move_character_to_room(player)
 				return false
 			end
