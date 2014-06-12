@@ -22,13 +22,6 @@ class DungeonMaster
 
 	attr_accessor :game_items, :character_list, :map_list, :map_location
 
-	def wait
-		diff = 0
-		until diff == 10000000
-			diff += 1
-		end
-	end
-
 	def ask_player(player)
 		manage_output("What does #{player.name} do?")
 	end
@@ -407,7 +400,7 @@ class DungeonMaster
 		rest_time.times do
 			player.hp=(1)
 			player.mp=(1)
-			wait
+			sleep(1)
 			player.count_temp_mod
 			manage_output('...')
 			unless current_location.type == 'outside'
@@ -473,7 +466,7 @@ class DungeonMaster
 		end
 		
 		check_living(chosen_target)
-		wait
+		sleep(1)
 	end
 	
 
