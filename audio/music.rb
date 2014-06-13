@@ -39,10 +39,25 @@ class SoundTrack
 		execute_chord(chord)
 	end
 	
+	# n = 10
+	# n * 100^0, n * 100^1, n * 100^2, n * 100^3
+	
 	def execute_chord(chord)
-		chord.each do |member|
-			@osc.send('chord', member)
+		#10, 1000, 100,000, 10,000,000
+		0	1	2	3
+		10  100 
+		index = 0
+		encode = 0
+		chord.length.times do
+			encode += chord[index] 
+			
+			
+			index -= 1
+			
 		end
+# 		chord.each do |member|
+# 			@osc.send('chord', member)
+# 		end
 	end
 	
 	def execute_tempo(tempo)
