@@ -20,6 +20,11 @@ require "items"
 require "qwertyio"
 require "art"
 
+begin
+	require "audio/music"
+rescue LoadError
+	puts 'Couldn\'t load audio dependencies. Continuing without sound. See readme for details.'
+end
 
 class Game
 
