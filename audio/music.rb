@@ -129,12 +129,12 @@ end
 
 if __FILE__==$0
 	st = SoundTrack.new
-# 	st.new_situation('title')
-# 	st.sound_on
-# 	sleep(4)
-# 	st.volume(0.4)
-# 	sleep(4)
-# 	st.sound_off
+	st.new_situation('title')
+	st.sound_on
+	sleep(4)
+	st.volume(0.4)
+	sleep(4)
+	st.sound_off
 	encode = st.encode_pitches([20, 40, 60, 80])
 	puts "encoded #{encode}"
 	puts "unencoded #{st.unencode_pitches(encode)}"

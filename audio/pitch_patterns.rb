@@ -1,7 +1,7 @@
 class PitchPattern
 
 	def initialize
-		@base_pitch = 60 + rand(12)
+		@base_pitch = 48 + rand(12)
 		@score_book = {'title' => [[0,4,5,7], 400]}
 	end
 

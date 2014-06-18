@@ -21,7 +21,7 @@ module QwertyIO
 				end
 			end	
 			manage_output('Please make a valid choice')
-			manage_output(good_answers.each { |x| x })
+			manage_output(good_answers.each { |x| (x.to_s) + ' ' })
 		end
 		
 	end
