@@ -37,43 +37,9 @@ class SoundTrack
 		chord = @pitches.choose_chord(event)
 		execute_chord(chord)
 	end
-	
-	# n = 10
-	# n * 100^0, n * 100^1, n * 100^2, n * 100^3
-	# x * 10^(0 * 2), x * 10^(1 * 2), x * 10^(2 * 2), x * 10^(3 * 2)
-	# 55
-	# 5600
-	# 570000
-	# 58000000
-	#
-	# 55 56 57 58
-	
-	#5655
-	#1299
-	
-# 	100 * x = 10
-# 	x = 1/10 (0.1)
-# 	
-# 	
-# 	counter 0
-# 	100/10 = 10
-# 	counter 1
-# 	10/10 = 1
-# 	counter 2
-# 	1/10 = 0.1 (0)
-# 	counter 3
-# 	
-# 	350/10 = 35
-# 	1
-# 	35/10 = 3
-# 	2
-# 	3/10 = 0
-# 	3
-
-	
-
 
 	def digit_calculator(integer)
+		# not used. Written as a rubric for audio program.
 		digits = 0
 		while integer > 0
 			integer = integer/10
@@ -83,6 +49,7 @@ class SoundTrack
 	end
 	
 	def unencode_pitches(encoded)
+		# not used. Written as a rubric for unencoding in audio program
 		double_digits = digit_calculator(encoded)/2
 		index = double_digits
 		output = 0
@@ -90,7 +57,6 @@ class SoundTrack
 		double_digits.times do
 			index -= 1
 			output = encoded / 10**(index * 2)
-			puts "index #{index} output #{output}"
 			encoded -= output * 10**(index * 2)
 			chord << output	
 		end
@@ -135,7 +101,4 @@ if __FILE__==$0
 	st.volume(0.4)
 	sleep(4)
 	st.sound_off
-	encode = st.encode_pitches([20, 40, 60, 80])
-	puts "encoded #{encode}"
-	puts "unencoded #{st.unencode_pitches(encode)}"
 end

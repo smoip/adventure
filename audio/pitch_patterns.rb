@@ -1,13 +1,12 @@
 class PitchPattern
 
 	def initialize
-		@base_pitch = 48 + rand(12)
-		@score_book = {'title' => [[0,4,5,7], 400]}
+		@base_pitch = 60 + rand(12)
+		@score_book = {'title' => [[0,4,5,7], 600]}
 	end
 
 	def available_pitches(event)
 		chord_choices = @score_book[event][0]
-		puts "from avail: #{chord_choices}"
 		return chord_choices
 	end
 
@@ -18,7 +17,6 @@ class PitchPattern
 		chord_choices.length.times do
 			chord_members << (chord_choices.shuffle.first + @base_pitch)
 		end
-		puts "from rando1: #{chord_members}"
 		
 		chord_members.collect! do |x|
 			if rand(5) == 0
@@ -27,7 +25,6 @@ class PitchPattern
 				x
 			end
 		end
-		puts "from rando2: #{chord_members}"
 		return chord_members
 	end
 	
