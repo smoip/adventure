@@ -16,7 +16,7 @@ Unzip all program files into the same directory.
 ## Usage:
 $ ruby adventure.rb
 
-## Dependencies
+## Dependencies:
 Running the audio component (still under development) uses Open Sound Control and requires the osc-ruby and eventmachine gems. Audio also uses Max/MSP/Jitter for sound synthesis and requries [Max 5 Runtime or later](http://cycling74.com/downloads/older/).  Adventure may be run without sound.
 
 
