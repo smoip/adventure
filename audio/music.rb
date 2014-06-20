@@ -1,3 +1,6 @@
+# this load information might belong in 'adventure'
+# that way adventure has a run_sound var that can be used as a flag each time a SoundTrack is called
+
 loadstat_osc = false
 loadstat_em = false
 run_sound = false
@@ -5,6 +8,7 @@ run_sound = false
 begin
 	loadstat_osc = require 'osc-ruby'
 	loadstat_em = require 'osc-ruby/em_server'
+		# needs a way to check for the presence of max or SC on system
 rescue LoadError
 	puts 'Can\'t find dependencies for audio.  Continuing without sound. Please check readme for details.'
 end
@@ -18,11 +22,14 @@ if run_sound == true
 		$: << File.expand_path(File.dirname("audio"))
 		require "pitch_patterns"
 		require "osc_out"
+		system("open audio_component_msp/adventure_sound.maxpat")
+		# needs an at_exit handler to shut down max when closed
 	else
 		require "audio/pitch_patterns"
 		require "audio/osc_out"
+		system("open audio/audio_component_msp/adventure_sound.maxpat")
+		# needs an at_exit handler to shut down max when closed
 	end
-	system("open audio/audio_component_msp/adventure_sound.maxpat")
 end
 
 
@@ -35,6 +42,7 @@ class SoundTrack
 	
 	def check_for_synthesizer
 		# pings max or SC through OSC and waits for a response, otherwise sends back a 'no music' message
+		# set run_sound to false
 	end
 
 	def sound_on
