@@ -1,10 +1,28 @@
-if __FILE__==$0
-	$: << File.expand_path(File.dirname("audio"))
-	require "pitch_patterns"
-	require "osc_out"
-else
-	require "audio/pitch_patterns"
-	require "audio/osc_out"
+loadstat_osc = false
+loadstat_em = false
+run_sound = false
+
+begin
+	loadstat_osc = require 'osc-ruby'
+	loadstat_em = require 'osc-ruby/em_server'
+rescue LoadError
+	puts 'Can\'t find dependencies for audio.  Continuing without sound. Please check readme for details.'
+end
+
+if loadstat_osc == true and loadstat_em == true
+	run_sound = true
+end
+
+if run_sound == true
+	if __FILE__==$0
+		$: << File.expand_path(File.dirname("audio"))
+		require "pitch_patterns"
+		require "osc_out"
+	else
+		require "audio/pitch_patterns"
+		require "audio/osc_out"
+	end
+	system("open audio/audio_component_msp/adventure_sound.maxpat")
 end
 
 
@@ -13,6 +31,10 @@ class SoundTrack
 	def initialize
 		@osc = OscServer.new
 		@pitches = PitchPattern.new
+	end
+	
+	def check_for_synthesizer
+		# pings max or SC through OSC and waits for a response, otherwise sends back a 'no music' message
 	end
 
 	def sound_on
