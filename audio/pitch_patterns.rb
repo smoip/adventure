@@ -4,7 +4,11 @@ class PitchPattern
 		@base_pitch = 60 + rand(12)
 		@score_book = {'title' => [[0,4,5,7], 600]}
 	end
-
+# what am I building?
+# method picks bass note
+# bass method also picks bass pattern
+# returns that to music
+# music should have an array like the map which stores situation music for each game
 	def available_pitches(event)
 		chord_choices = @score_book[event][0]
 		return chord_choices

@@ -12,12 +12,12 @@ class DungeonMaster
 	include QwertyIO
 
 	def initialize
-	@game_items = []
-	@character_list = {}
-	@map_list = []
-	@map_location = 0
-	@world_map_list = []
-	@world_map_location = 0
+		@game_items = []
+		@character_list = {}
+		@map_list = []
+		@map_location = 0
+		@world_map_list = []
+		@world_map_location = 0
 	end
 
 	attr_accessor :game_items, :character_list, :map_list, :map_location

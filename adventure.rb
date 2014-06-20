@@ -31,6 +31,7 @@ class Game
 		@player_turn_counter = 0
 		@game_turn_counter = 0
 		@dm = []
+		@sound_track = SoundTrack.new
 		@exit_flag = false
 	end
 	
@@ -73,7 +74,7 @@ class Game
 		welcome_text
 		player = guide.new_player_options
 		guide.beginning_flavor_text(player)
-		 enter_dungeon_first_time(guide, player)
+		enter_dungeon_first_time(guide, player)
 		run_game
 	end
 	
