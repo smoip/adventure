@@ -22,7 +22,6 @@ class Character
 		@level = 0
 		@charExp = 0
 		@exp_value = 1
-		@alive = true
 		@inventory = {'potion' => Item.new(0, 0), 'weapon' => Item.new(0, 0), 'armor' => Item.new(0, 0)}
 		@gold = 0
 		@spell_list = []
