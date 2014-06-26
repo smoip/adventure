@@ -261,6 +261,54 @@ describe Character do
 		end
 	end
 	
+	describe '#force_level_up' do
+		it 'should level up once' do
+			@test_char.force_level_up
+			expect(@test_char.level).to eql 1
+		end
+	end
+
+	describe '#real_attack_points' do
+		context 'no modifier' do
+			it 'should equal attackPoints' do
+				expect(@test_char.real_attack_points).to eql @test_char.attackPoints
+			end
+		end
+		context 'modifier' do
+			it 'should not equal attackPoints' do
+				@test_char.instance_variable_set("@ap_mod", 2)
+				expect(@test_char.real_attack_points).to_not eql @test_char.attackPoints
+			end
+		end
+	end
+	
+	describe '#real_defense_points' do
+		context 'no modifier' do
+			it 'should equal defensePoints' do
+				expect(@test_char.real_defense_points).to eql @test_char.defensePoints
+			end
+		end
+		context 'modifier' do
+			it 'should not equal defensePoints' do
+				@test_char.instance_variable_set("@dp_mod", 2)
+				expect(@test_char.real_defense_points).to_not eql @test_char.defensePoints
+			end
+		end
+	end
+	
+	describe '#real_agility_points' do
+		context 'no modifier' do
+			it 'should equal agility' do
+				expect(@test_char.real_agility_points).to eql @test_char.agility
+			end
+		end
+		context 'modifier' do
+			it 'should not equal agility' do
+				@test_char.instance_variable_set("@ag_mod", 2)
+				expect(@test_char.real_agility_points).to_not eql @test_char.agility
+			end
+		end
+	end
 	
 	describe '#cast_spell' do
 		context 'not enough mp for spell' do
