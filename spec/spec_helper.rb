@@ -8,5 +8,9 @@ require_relative '../map'
 require_relative '../qwertyio'
 
 def random_name
-	('a'..'z').to_a.sample(8).join
+	('a'..'z').to_a.sample(8).join.capitalize
+end
+
+def random_number
+	random(10)
 end

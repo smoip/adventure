@@ -68,14 +68,74 @@ describe Character do
 	end
 	
 	describe '#alive?' do
-		it 'should return \'true\' when hp above zero' do
-			expect(@test_char.alive?).to be true
+		context 'when hp above zero' do
+			it 'should return \'true\'' do
+				expect(@test_char.alive?).to be true
+			end
 		end
-		it 'should return \'false\' when hp not above zero' do
-			allow(@test_char).to receive(:currentHP).and_return( 0 )
-			expect(@test_char.currentHP).to eql 0
-			expect(@test_char.alive?).to be false
-			# wuh-oh.  Doesn't work
+		context 'when hp not above zero' do
+			it 'should return \'false\'' do
+				@test_char.instance_variable_set("@currentHP", 0)
+				expect(@test_char.alive?).to be false
+			end
+		end
+	end
+	
+	describe '#hp=' do
+		it 'should change hp' do
+			@test_char.hp=(-1)
+			expect(@test_char.currentHP).to eql 9
+		end
+		context 'when hp change exceeds maxHP' do
+			it 'should return maxHP' do
+				@test_char.hp=(10)
+				expect(@test_char.currentHP).to eql 10
+			end
+		end
+		context 'when negative hp change is less than zero' do
+			it 'should return zero' do
+				@test_char.hp=(-25)
+				expect(@test_char.currentHP).to eql 0
+			end
+		end
+	end
+	
+	describe '#mp=' do
+		it 'should change mp' do
+			@test_char.mp=(-1)
+			expect(@test_char.currentMP).to eql 9
+		end
+		context 'when mp change exceeds maxMP' do
+			it 'should return maxHP' do
+				@test_char.mp=(10)
+				expect(@test_char.currentMP).to eql 10
+			end
+		end
+		context 'when negative mp change is less than zero' do
+			it 'should return zero' do
+				@test_char.mp=(-25)
+				expect(@test_char.currentMP).to eql 0
+			end
+		end
+	end
+	
+	describe '#status_check' do
+		it 'should return stats' do
+			expect(@test_char.status_check[0]).to eql "Name: #{@name}"
+		end
+		context 'if player knows spells' do
+			it 'should return spell_list' do
+				@test_char.instance_variable_set("@spell_list", ['spell'])
+				expect(@test_char.status_check[10]).not_to eql nil
+			end
+		end
+	end
+	
+	describe '#learn_spell' do
+		it 'should add spells to spell_list' do
+			spell = random_name
+			@test_char.learn_spell(spell)
+			expect(@test_char.spell_list[0]).to eql spell
 		end
 	end
 
