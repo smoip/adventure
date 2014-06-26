@@ -5,6 +5,8 @@ describe Character do
 	before :each do
 		@name = random_name
 		@test_char = Character.new(@name, 0)
+		@target_name = random_name
+		@target = Character.new(@target_name, 1)
 	end
 	
 	describe '#initialize' do
@@ -138,5 +140,150 @@ describe Character do
 			expect(@test_char.spell_list[0]).to eql spell
 		end
 	end
+	
+	describe '#hit_ratio' do
+		context 'active player\'s agility is higher than target\'s' do
+			it 'should return hit ratio 1' do
+				allow(@target).to receive(:real_agility_points).and_return(1)
+				allow(@test_char).to receive(:real_agility_points).and_return (2)
+				expect(@test_char.hit_ratio(@target)).to eql 1
+			end
+		end
+		context 'target\'s agility is higher than active player\'s' do
+			it 'should return hit ratio 2' do
+				allow(@target).to receive(:real_agility_points).and_return(2)
+				allow(@test_char).to receive(:real_agility_points).and_return (1)
+				expect(@test_char.hit_ratio(@target)).to eql 2
+			end
+		end
+	end
+	
+	describe '#damage_amount' do
+		context 'player ap greater than target dp/2' do
+			it 'should return damage of 4' do
+				allow(@target).to receive(:real_defense_points).and_return(2)
+				allow(@test_char).to receive(:real_attack_points).and_return (5)
+				expect(@test_char.damage_amount(@target)).to eql 4	
+			end
+		end
+		context 'player ap not greater than target dp/2' do
+			it 'should return damage of 1' do
+				allow(@target).to receive(:real_defense_points).and_return(4)
+				allow(@test_char).to receive(:real_attack_points).and_return (1)
+				expect(@test_char.damage_amount(@target)).to eql 1
+			end
+		end
+	end
+	
+	describe '#hit_target?' do
+		# untestable with current construction (rand is a singleton)
+	end
+	
+	describe '#attack' do
+		context 'target is already dead' do
+			it 'should not change target hp' do
+				allow(@target).to receive(:alive?).and_return(false)
+				@test_char.attack(@target)
+				expect(@target.currentHP).to eql @target.maxHP
+			end
+		end
+		context 'target is not already dead' do
+			context 'player misses' do
+				it 'should not change target hp' do
+					allow(@test_char).to receive(:hit_target?).and_return(false)
+					@test_char.attack(@target)
+					expect(@target.currentHP).to eql @target.maxHP
+				end
+			end
+			context 'player hits' do
+				it 'should decrease target hp' do
+					allow(@test_char).to receive(:hit_target?).and_return(true)
+					@test_char.attack(@target)
+					expect(@target.currentHP).to be < @target.maxHP
+				end
+				context 'target is slain' do
+					it 'should increase player exp' do
+						@test_char.instance_variable_set("@attackPoints", 40)
+						allow(@test_char).to receive(:hit_target?).and_return(true)
+						@test_char.attack(@target)
+						expect(@test_char.charExp).to be >= 1
+					end
+					it 'should increase player gold' do
+						@test_char.instance_variable_set("@attackPoints", 40)
+						allow(@test_char).to receive(:hit_target?).and_return(true)
+						allow(@target).to receive(:gold_value).and_return(6)
+						@test_char.attack(@target)
+						expect(@test_char.gold).to be > 0
+					end
+				end
+				context 'target is not slain' do
+					it 'should not increase player exp' do
+						allow(@test_char).to receive(:hit_target?).and_return(true)
+						@test_char.attack(@target)
+						expect(@test_char.charExp).to eql 0
+					end
+				end
+			end
+		end
+	end
+	
+	describe '#gain_exp' do
+		it 'should increase player exp' do
+			@test_char.gain_exp(4)
+			expect(@test_char.charExp).to be > 0
+		end
+	end
 
+	describe '#gain_gold' do
+		it 'should increase player gold' do
+			@test_char.gain_gold(4)
+			expect(@test_char.gold).to be > 0
+		end
+	end
+	
+	describe '#gold_value' do
+		it 'should return a value greater than eight' do
+			@test_char.instance_variable_set("@level", 8)
+			expect(@test_char.gold_value).to be > 6
+		end
+	end
+	
+	describe '#level_up' do
+		it 'should level up once' do
+			@test_char.instance_variable_set("@charExp", 11)
+			@test_char.level_up
+			expect(@test_char.level).to eql 1
+		end
+		it 'should level up twice' do
+			@test_char.instance_variable_set("@charExp", 33)
+			@test_char.level_up
+			expect(@test_char.level).to eql 2
+		end
+	end
+	
+	
+	describe '#cast_spell' do
+		context 'not enough mp for spell' do
+			it 'should not effect target hp' do
+				@test_char.instance_variable_set("@currentMP", 0)
+				@test_char.cast_spell('fireball', @target)
+				expect(@target.currentHP).to eql @target.maxHP
+			end
+		end
+		context 'enough mp for spell' do
+			it 'should decrease player mp' do
+				@test_char.cast_spell('fireball', @target)
+				expect(@target.currentHP).to be < @target.maxHP
+			end
+		end
+	end
+	
+	describe '#mod_spell_effect_hp' do
+		it 'should return -4' do
+			expect(@test_char.mod_spell_effect_hp({'target_hp' => -4, 'mp' => 4}, @target)).to eql -4
+		end
+	end
+	
+	
+	
 end

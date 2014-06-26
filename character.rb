@@ -102,7 +102,8 @@ class Character
 	def attack(target)
 		if target.alive?
 			manage_output(self.name + ' attacks ' + target.name + '.')
-			if rand(hit_ratio(target)) == 0
+			# break this rand into another method
+			if hit_target?(target)
 				damage = damage_amount(target)
 				manage_output(target.name + " takes #{damage} damage!")
 				target.hp=(-(damage))
@@ -115,6 +116,14 @@ class Character
 			end
 		else
 			manage_output(target.name + ' is already dead.')
+		end
+	end
+	
+	def hit_target?(target)
+		if rand(hit_ratio(target)) == 0
+			return true
+		else
+			return false
 		end
 	end
 	
@@ -146,8 +155,6 @@ class Character
 	end
 	
 	def level_check
-		# checks current exp against level up table
-		# performs level up if applicable
 		if @level < (@charExp/10)
 			level_up
 		end
@@ -237,8 +244,12 @@ class Character
 		end
 	end
 	
+	def mod_spell_effect_hp(spell_effect, target)
+		spell_effect['target_hp'] + (spell_effect['target_hp']/(spell_effect['target_hp'].abs) * (rand(self.level + 1)* (spell_effect['target_hp']/4)))
+	end
+	
 	def hp_spell(spell_effect, target)
-		spell_outcome = spell_effect['target_hp'] + (spell_effect['target_hp']/(spell_effect['target_hp'].abs) * (rand(self.level + 1)* (spell_effect['target_hp']/4)))
+		spell_outcome = mod_spell_effect_hp(spell_effect, target)
 		effect_string = "#{target.name} "
 		if spell_outcome > 0
 			effect_string += 'gains '
