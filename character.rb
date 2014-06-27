@@ -66,7 +66,8 @@ class Character
 	def status_check
 		status = ["Name: #{name}", "Level: #{level}", "Exp: #{charExp}", "Class: #{self.class}", "Hit Points: #{currentHP}/#{maxHP}", "Magic Points: #{currentMP}/#{maxMP}", "Attack: #{real_attack_points}", "Defense: #{real_defense_points}", "Agility: #{real_agility_points}", "Gold: #{gold}"]
 		if @spell_list != []
-			status << ["Spells: #{@spell_list.each {|x| x.to_s}}"]
+			spells = @spell_list
+			status << "Spells: #{spells}"
 		end
 		status
 	end

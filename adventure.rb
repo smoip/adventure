@@ -196,7 +196,14 @@ class Game
 				end
 			
 				action_choice = {'move' => player_move, 'm' => player_move, 'attack' => player_attack, 'a' => player_attack, 'item' => player_item, 'i' => player_item, 'spell' => player_spell, 's' => player_spell, 'take' => player_take, 'status' => player_status, 'inventory' => player_inventory, 'look' => player_look, 'rest' => player_rest}
-				action_choice[manage_input(['move', 'm', 'attack', 'a', 'item', 'i', 'spell', 's', 'take', 'status', 'inventory', 'look', 'rest'])].call
+				choice = manage_input(['move', 'm', 'attack', 'a', 'item', 'i', 'spell', 's', 'take', 'status', 'inventory', 'look', 'rest'])
+				# here's the broken part - it's not going through the loop right, finish specs
+				until choice.length < 1
+					unless choice == nil 
+						action_choice[choice.shift].call
+					end
+				end
+				
 			end
 			
 		elsif player.npc == 1

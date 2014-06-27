@@ -504,9 +504,9 @@ class DungeonMaster
 	
 	def new_player_options
 		manage_output('Please choose a class for a new player:')
-		class_type = playable_characters(manage_input(playable_characters_name))
+		class_type = playable_characters(manage_input(playable_characters_name)[0])
 		manage_output("Enter a name for a new #{class_type}:")
-		name = manage_input([]).capitalize
+		name = format_output(manage_input([])).capitalize
 		
 		# String.new not allowed.  I solved this problem before - find it. SOLVED MOTHAFUCKA
 		player = new_player(class_type, name, 0)
